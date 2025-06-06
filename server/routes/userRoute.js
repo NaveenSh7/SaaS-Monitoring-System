@@ -13,15 +13,16 @@ router.get('/all', async (req, res) => {
   }
 });
 
+//Add new user
 router.post('/' , async (req,res)=>{
 
      try {
-        const {name,email,password} = req.body;
+        const {name,email,services} = req.body;
 
-            if (!name || !email || !password) {
+            if (!name || !email || !services) {
       return res.status(400).json({ message: 'All fields required' });
     }
-        const response = await createUser(name,email,password);
+        const response = await createUser(name,email,services);
         res.json(response);
         
      } catch (err) {
