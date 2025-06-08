@@ -20,13 +20,15 @@ const getUser = async (email) => {
     'SELECT * FROM users WHERE email = $1 ',
     [email]
   );
+  return result.rows[0];
 }
 
-const updateUser = async (name ,email,password)=>{
+const updateUser = async (name, email, services)=>{
   const result = await db.query(
-   'UPDATE users SET name = $1, email = $2, password = $3 WHERE email = $2 RETURNING *',
-    [name,email,password]
-  )
+   'UPDATE users SET name = $1, email = $2, services = $3 WHERE email = $2 RETURNING *',
+    [name, email, services]
+  );
+    return result.rows[0];
 };
 
 const deleteUser = async (email) => {
@@ -34,6 +36,7 @@ const deleteUser = async (email) => {
     'DELETE FROM users WHERE email = $1 RETURNING *',
     [email]
   );
+    return result.rows[0];
 }
 
 module.exports = {
