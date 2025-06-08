@@ -17,11 +17,11 @@ router.get('/all', async (req, res) => {
 router.post('/' , async (req,res)=>{
 
      try {
-        const {name,email,services} = req.body;
+        const { name, email, services = [] } = req.body;
+        if (!name || !email) {
+          return res.status(400).json({ message: 'Name and email required' });
+        }
 
-            if (!name || !email || !services) {
-      return res.status(400).json({ message: 'All fields required' });
-    }
         const response = await createUser(name,email,services);
         res.json(response);
         
