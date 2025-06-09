@@ -1,0 +1,81 @@
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { signIn, signOut, useSession } from "next-auth/react";
+
+import Link from "next/link"
+import Image from "next/image"
+import {
+  Activity,
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  Code,
+  Database,
+  LineChart,
+  Loader2,
+  Router,
+  Shield,
+  Zap,
+} from "lucide-react"
+
+export default function Navbar (){
+    const { data: session } = useSession();
+
+return(
+<>
+ {/* Navbar */}
+      <header className="sticky top-0 z-40 w-full border-b border-zinc-800 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Activity className="h-6 w-6 text-emerald-500" />
+            <Link href="/" className="text-xl font-bold">Saas-Monitor</Link>
+          </div>
+          <nav className="hidden md:flex items-center gap-6">
+            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
+              Features
+            </Link>
+            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
+              Pricing
+            </Link>
+            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
+              Documentation
+            </Link>
+            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
+              Blog
+            </Link>
+          </nav>
+           
+
+          {session ?  (<>
+             <div className="flex items-center gap-x-4">
+    <Link
+      href="/dashboard"
+      className="text-sm font-medium px-2 py-1 hover:text-white cursor bg-emerald-600 hover:bg-emerald-700 border-0 rounded-sm"
+    >
+      Dashboard
+    </Link>
+    <Button
+      onClick={() => {
+        signOut();
+      }}
+      className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white "
+    >
+      Logout
+    </Button>
+  </div> </>) : (  <div className="flex items-center gap-4">
+            <Button 
+                onClick={ ()=>{ signIn("google") } }
+                className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white">
+              Login
+            </Button>
+            <Button 
+                onClick={ ()=>{ signIn("google") } }
+            className="bg-emerald-600 hover:bg-emerald-700">Sign Up Free</Button>
+          </div>) }
+        
+        </div>
+      </header>
+</>
+)
+}
