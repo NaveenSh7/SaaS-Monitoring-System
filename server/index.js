@@ -37,8 +37,9 @@ const checkApis = async () => {
       apis.map(async (api) => {
         try {
           var start = Date.now();
-         
+        
           const response = await axios.get(api.url, { timeout: 4000 });
+  
           const status = response.status === 200 ? 'up' : 'down';
          const  latency = Date.now() - start; 
           // call your own route `/api/uptime` to update uptime status

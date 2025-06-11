@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {createUptime ,updateUptime,getUptime } = require('../models/uptimeModel');
-
+const moment = require('moment-timezone');
+const db = require('../db');
 
 
 //Add new uptime
@@ -23,32 +24,49 @@ router.post('/' , async (req,res)=>{
 
 // changing status and adding new uptime/downtime
 
-router.put('/' , async (req,res)=>{
+router.put('/', async (req, res) => {
+  const { api_id, status, latency } = req.body;
+ console.log(api_id)
   try {
-    const {api_id,status,latency} = req.body;
-    const uptimes = await getUptime(api_id);
-    const ongoing = uptimes.find(row => row.ended_at === null);
+    // Step 1: Get the last record with ended_at IS NULL
+   
+    const current = await db.query(
+      'SELECT * FROM uptimes WHERE api_id = $1 AND ended_at IS NULL ORDER BY started_at DESC LIMIT 1',
+      [api_id]
+    );
 
+    const now = moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
 
-
-    const id = ongoing.id;
-  
-    if(status !== ongoing.status)
-    {
-        const result1 = await updateUptime(id);
-        const result2 = await createUptime(api_id ,status,latency);
-
-         res.json(result2);
-    }
-    else{
- res.json("kcuh change nhi karna ");
+    if (current.rows.length === 0) {
+      // No previous open record → Insert new
+      const inserted = await createUptime(api_id, status, latency);
+      return res.status(200).json({ message: 'First record created', inserted });
     }
 
-  } catch (error) {
-      //   res.status(500).json({ message: 'Error updating uptime' });
-       
+    const last = current.rows[0];
+
+    if (last.status === status) {
+      // Same status, just update latency if you want
+      await db.query(
+        'UPDATE uptimes SET latency = $1 WHERE id = $2',
+        [latency, last.id]
+      );
+      return res.status(200).json({ message: 'Status unchanged' });
+    }
+
+    // Status changed → Close previous
+    await updateUptime(last.id);
+
+    // Create new record
+    const inserted = await createUptime(api_id, status, latency);
+
+    res.status(200).json({ message: 'Status changed, new row created', inserted });
+
+  } catch (err) {
+    console.error('aaFailed to update uptime:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-})
+});
 
 
 module.exports = router;
