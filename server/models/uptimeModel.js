@@ -2,12 +2,12 @@ const db = require('../db');
 const moment = require('moment-timezone');
 
 // add a status change 
-const createUptime = async (api_id ,status ) => {
+const createUptime = async (api_id ,status,  latency ) => {
 const started_at = moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
 
     const result = await db.query (
-        'INSERT INTO uptimes (api_id ,status,started_at) VALUES ($1 ,$2, $3) RETURNING *',
-        [api_id ,status,started_at] );
+        'INSERT INTO uptimes (api_id ,status,started_at,latency) VALUES ($1 ,$2, $3,$4) RETURNING *',
+        [api_id ,status,started_at,latency] );
 
      return result.rows[0];
 };

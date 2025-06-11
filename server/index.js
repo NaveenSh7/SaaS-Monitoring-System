@@ -36,18 +36,23 @@ const checkApis = async () => {
     await Promise.all(
       apis.map(async (api) => {
         try {
+          var start = Date.now();
+         
           const response = await axios.get(api.url, { timeout: 4000 });
           const status = response.status === 200 ? 'up' : 'down';
-
+         const  latency = Date.now() - start; 
           // call your own route `/api/uptime` to update uptime status
           await axios.put(`http://localhost:${PORT}/api/uptime`, {
             api_id: api.id,
             status,
+              latency:latency,
           });
         } catch (err) {
+           const  latency = Date.now() - start; 
           await axios.put(`http://localhost:${PORT}/api/uptime`, {
             api_id: api.id,
             status: 'down',
+            latency:latency,
           });
         }
       })
