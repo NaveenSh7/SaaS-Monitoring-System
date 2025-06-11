@@ -13,6 +13,7 @@ router.get('/all', async (req, res) => {
   }
 });
 
+
 //Add new user
 router.post('/' , async (req,res)=>{
 
@@ -37,6 +38,7 @@ router.get('/' , async (req,res)=>{
   try {
  
     const {email } = req.query;
+    
     const result = await getUser(email);
     res.json(result);
 
