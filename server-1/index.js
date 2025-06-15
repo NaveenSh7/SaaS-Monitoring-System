@@ -12,6 +12,15 @@ const apiRoutes = require ('./routes/apiRoute');
 const uptimeRoutes = require('./routes/uptimeRoute');
 const PORT = process.env.PORT || 5000;
 
+
+// const Logger = require('saas-monitering-sdk');
+
+// Logger.init({
+//   secret: 'lodalasun',
+// });
+// app.use(Logger.middleware());
+
+
 // Middleware
 app.use(cors()); 
 app.use(express.json()); 
@@ -23,7 +32,7 @@ app.use('/api/uptime', uptimeRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  res.send(' API Running');
+  res.send(' Server-1 Running');
 });
 
 // function : check up or down => 
@@ -63,9 +72,7 @@ const checkApis = async () => {
   }
 };
 
-
 setInterval(checkApis, 5000); // run every 5 seconds
-
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

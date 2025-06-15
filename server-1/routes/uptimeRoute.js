@@ -68,5 +68,23 @@ router.put('/', async (req, res) => {
   }
 });
 
+//Get uptimes based on user
+
+router.get('/' , async (req,res)=>{
+  try {
+ 
+    const {api_id } = req.query;
+    
+    const result = await db.query(
+        'SELECT * FROM uptimes WHERE api_id = $1',
+        [api_id]
+      );
+    res.json(result.rows);
+
+  } catch (error) {
+        res.status(500).json({ message: 'Error fetching uptimes' });
+  }
+})
+
 
 module.exports = router;
