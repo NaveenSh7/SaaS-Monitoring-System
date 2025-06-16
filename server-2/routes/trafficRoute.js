@@ -9,7 +9,7 @@ router.post('/logs' , async (req,res)=>{
      try {
         const rawLogs = req.body;
         var apiSecret = req.headers['x-api-secret'];
-       console.log(rawLogs)
+      
 //   if (secret !== YOUR_EXPECTED_SECRET) return res.status(403).send('Forbidden');
       
             const enrichedLogs = rawLogs.map(log => {
@@ -34,7 +34,7 @@ router.post('/logs' , async (req,res)=>{
     log.endpoint,
    ]);
 
-   // console.log(values)
+   console.log(values)
 
   await db.query(
     `INSERT INTO logs (api_id, user_email , timestamp, method, response_code, ip_address, country, city, endpoint)
