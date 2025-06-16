@@ -9,7 +9,7 @@ router.post('/logs' , async (req,res)=>{
      try {
         const rawLogs = req.body;
         var apiSecret = req.headers['x-api-secret'];
-        apiSecret = 7;
+       console.log(rawLogs)
 //   if (secret !== YOUR_EXPECTED_SECRET) return res.status(403).send('Forbidden');
       
             const enrichedLogs = rawLogs.map(log => {
