@@ -17,7 +17,7 @@ router.get('/all', async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { user_id, name, url, api_type, plan, sdk_code } = req.body
+    const { user_id, name, url, api_type, plan } = req.body
 
     // Validate required fields
     if (!user_id || !name || !url || !api_type || !plan) {
@@ -39,15 +39,6 @@ router.post("/", async (req, res) => {
         error: 'plan must be either "free" or "pro"',
       })
     }
-
-    // For pro plan, sdk_code should be provided
-    if (plan === "pro" && !sdk_code) {
-      return res.status(400).json({
-        error: "sdk_code is required for pro plan",
-      })
-    }
-
-    
     
     const newApi = await createApi({
       user_id,
@@ -55,7 +46,6 @@ router.post("/", async (req, res) => {
       url,
       api_type,
       plan,
-      sdk_code: plan === "pro" ? sdk_code : null,
     })
     
     res.status(201).json({

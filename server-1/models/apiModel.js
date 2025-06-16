@@ -18,22 +18,22 @@ const getAllApis = async () => {
 // Create new API and insert initial uptime entry
 const createApi = async (apiData) => {
   try {
-    const { user_id, name, url, api_type, plan, sdk_code } = apiData
+    const { user_id, name, url, api_type, plan } = apiData
 
     // 1. Insert into apis table
     const result = await db.query(
-      `INSERT INTO apis (user_id, name, url, api_type, plan, sdk_code) 
-       VALUES ($1, $2, $3, $4, $5, $6) 
+      `INSERT INTO apis (user_id, name, url, api_type, plan) 
+       VALUES ($1, $2, $3, $4, $5) 
        RETURNING *`,
-      [user_id, name, url, api_type, plan, sdk_code]
+      [user_id, name, url, api_type, plan]
     )
 
     const newApi = result.rows[0]
 
     // 2. Immediately insert into uptimes table
     await db.query(
-      `INSERT INTO uptimes (api_id, status, started_at)
-       VALUES ($1, 'up', NOW())`,
+      `INSERT INTO uptimes (api_id)
+       VALUES ($1)`,
       [newApi.id]
     )
 
@@ -70,3 +70,5 @@ getApi,
 createApi,
 updateApi
 };
+
+
