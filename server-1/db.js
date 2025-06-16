@@ -9,7 +9,7 @@ const client = new Client({
 });
 
 client.connect()
-  .then(() => console.log('✅ PostgreSQL connected'))
+  .then(() => console.log('✅ PostgreSQL connected with server-1'))
   .catch((err) => console.error('❌ Connection error:', err.stack));
 
 module.exports = client;

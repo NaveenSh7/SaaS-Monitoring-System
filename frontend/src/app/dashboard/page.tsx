@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/Navbar"
+import ApiStatusChart from '../uptime/page';
 
 interface ApiData {
   id: string
@@ -20,51 +21,87 @@ interface ApiData {
   status?: string // We'll assign this randomly for demo
 }
 
+type ApiEvent = {
+  id: number;
+  api_id: number;
+  status: 'up' | 'down';
+  latency: number | null;
+  started_at: string;
+  ended_at: string | null;
+};
+
+
+
+
 export default function Dashboard() {
   const router = useRouter()
   const { data: session } = useSession()
   const [apis, setApis] = useState<ApiData[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
+  const [uptimes, setUptimes] = useState<ApiEvent[]>([]); 
+
 
   // Fetch APIs for the logged-in user
-  useEffect(() => {
-    const fetchApis = async () => {
-      if (!session?.user?.email) return
 
-      try {
-        const userEmail = session.user.email
-        const userRes = await fetch(`http://localhost:5000/api/users?email=${userEmail}`)
-        if (!userRes.ok) throw new Error("Failed to fetch user")
 
-        const userData = await userRes.json()
-        const userId = userData.id
+    // fetch uptime of a perticular api
 
-        const response = await fetch(`http://localhost:5000/api/apis?user_id=${userId}`)
+useEffect(() => {
+  const fetchApis = async () => {
+    if (!session?.user?.email) return;
 
-        if (response.ok) {
-          const data = await response.json()
+    try {
+      const userEmail = session.user.email;
+      const userRes = await fetch(`http://localhost:5000/api/users?email=${userEmail}`);
+      if (!userRes.ok) throw new Error("Failed to fetch user");
 
-          setApis(data)
+      const userData = await userRes.json();
+      const userId = userData.id;
 
-          // Set the first API as selected if available
-          if (data.length > 0 && !selectedAPI) {
-            setSelectedAPI(data[0].id)
-          }
-        } else {
-          console.error("Failed to fetch APIs")
+      const response = await fetch(`http://localhost:5000/api/apis?user_id=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setApis(data);
+
+        // ✅ Set selected API separately and let another useEffect handle fetchUptimes
+        if (data.length > 0) {
+          setSelectedAPI(data[0].id);
         }
-      } catch (error) {
-        console.error("Error fetching APIs:", error)
-      } finally {
-        setLoading(false)
+      } else {
+        console.error("Failed to fetch APIs");
       }
+    } catch (error) {
+      console.error("Error fetching APIs:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchApis()
-  }, [session, selectedAPI])
+  fetchApis();
+}, [session]);
 
-  const selectedAPIData = apis.find((api) => api.id === selectedAPI)
+useEffect(() => {
+  const fetchUptimes = async () => {
+    if (!selectedAPI) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/uptime?api_id=${selectedAPI}`);
+      const data = await response.json();
+      setUptimes(data);
+      console.log("Fetched uptimes for API", uptimes);
+    } catch (error) {
+      console.error("Error fetching uptimes:", error);
+    }
+  };
+
+  fetchUptimes();
+}, [selectedAPI]);
+
+
+
+
+  const selectedAPIData = apis.find((api) => api.id === selectedAPI);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -240,27 +277,28 @@ export default function Dashboard() {
             </div>
 
             {/* Charts Row */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <LineChart className="h-5 w-5 text-emerald-500" />
-                    Response Time Trends
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative rounded-lg border border-zinc-800 bg-zinc-950 overflow-hidden">
-                    <Image
-                      src="/placeholder.svg?height=300&width=500"
-                      width={500}
-                      height={300}
-                      alt="Response Time Chart"
-                      className="w-full h-auto"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+
+<div className="grid gap-6 lg:grid-cols-2 w-full">
+  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+    <CardHeader className="pb-2">
+      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+        <LineChart className="h-5 w-5 text-emerald-500" />
+        Response Time Trends
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="h-[350px] p-4 pt-0">
+      {/* Conditional rendering with fallback text */}
+      {uptimes.length > 0 ? (
+        <ApiStatusChart data={uptimes} />
+      ) : (
+        <div className="text-sm text-zinc-400 italic mt-10 text-center">
+          No uptime data available.
+        </div>
+      )}
+    </CardContent>
+  </Card>
+</div>
+
 
             {/* Recent Activity */}
             <Card className="bg-zinc-900 border-zinc-800">
