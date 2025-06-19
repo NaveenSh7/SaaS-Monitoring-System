@@ -9,21 +9,21 @@ router.post('/logs' , async (req,res)=>{
      try {
         const rawLogs = req.body;
         var apiSecret = req.headers['x-api-secret'];
-       console.log(rawLogs)
-//   if (secret !== YOUR_EXPECTED_SECRET) return res.status(403).send('Forbidden');
-      
-            const enrichedLogs = rawLogs.map(log => {
-    const geo = geoip.lookup(log.ip || '') || {};
-    return {
-      ...log,
-      country: geo.country || null,
-      city: geo.city || null,
-    };
-  });
-
-  
-  const values = enrichedLogs.map(log => [
-     apiSecret,
+        //   if (secret !== YOUR_EXPECTED_SECRET) return res.status(403).send('Forbidden');
+        
+        const enrichedLogs = rawLogs.map(log => {
+          const geo = geoip.lookup(log.ip || '') || {};
+          return {
+            ...log,
+            country: geo.country || null,
+            city: geo.city || null,
+          };
+        });
+        
+        console.log(enrichedLogs)
+        
+        const values = enrichedLogs.map(log => [
+          apiSecret,
      "example@gmail.com",
       new Date(log.timestamp).toISOString(),
      log.method,
@@ -32,7 +32,7 @@ router.post('/logs' , async (req,res)=>{
     log.country,
     log.city,
     log.endpoint,
-   ]);
+  ]);
 
    // console.log(values)
 
