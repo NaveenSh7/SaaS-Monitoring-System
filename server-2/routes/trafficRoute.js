@@ -20,19 +20,19 @@ router.post('/logs' , async (req,res)=>{
           };
         });
         
-        console.log(enrichedLogs)
+        // console.log(enrichedLogs)
         
         const values = enrichedLogs.map(log => [
           apiSecret,
-     "example@gmail.com",
-      new Date(log.timestamp).toISOString(),
-     log.method,
-    log.statusCode,
-    log.serverIP,
-    log.country,
-    log.city,
-    log.endpoint,
-  ]);
+          "example@gmail.com",
+            new Date(log.timestamp).toISOString(),
+          log.method,
+          log.statusCode,
+          log.serverIP,
+          log.country,
+          log.city,
+          log.endpoint,
+        ]);
 
    console.log(values)
 
