@@ -12,7 +12,7 @@ router.post('/logs' , async (req,res)=>{
         //   if (secret !== YOUR_EXPECTED_SECRET) return res.status(403).send('Forbidden');
         
         const enrichedLogs = rawLogs.map(log => {
-          const geo = geoip.lookup(log.serverIP || '') || {};
+          const geo = geoip.lookup(log.ip || '') || {};
           return {
             ...log,
             country: geo.country || null,
@@ -28,7 +28,7 @@ router.post('/logs' , async (req,res)=>{
             new Date(log.timestamp).toISOString(),
           log.method,
           log.statusCode,
-          log.serverIP,
+          log.ip,
           log.country,
           log.city,
           log.endpoint,
