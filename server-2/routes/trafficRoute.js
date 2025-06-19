@@ -34,7 +34,7 @@ router.post('/logs' , async (req,res)=>{
     log.endpoint,
   ]);
 
-   // console.log(values)
+   console.log(values)
 
   await db.query(
     `INSERT INTO logs (api_id, user_email , timestamp, method, response_code, ip_address, country, city, endpoint)
