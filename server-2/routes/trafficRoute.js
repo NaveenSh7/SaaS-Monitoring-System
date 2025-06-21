@@ -9,8 +9,8 @@ router.post('/logs' , async (req,res)=>{
      try {
         const rawLogs = req.body;
         var api_key = req.headers['x-api-secret'];
-        
-       const { rows } = await db.query('SELECT id FROM apis WHERE api_key = $1', [api_key]);
+           
+          const { rows } = await db.query('SELECT id FROM apis WHERE api_key = $1', [api_key]);
        const api_id = rows[0]?.id;
         
         const enrichedLogs = rawLogs.map(log => {
@@ -22,7 +22,7 @@ router.post('/logs' , async (req,res)=>{
           };
         });
         
-        console.log(enrichedLogs)
+        // console.log(enrichedLogs)
         
         const values = enrichedLogs.map(log => [
           api_id,
@@ -36,7 +36,7 @@ router.post('/logs' , async (req,res)=>{
           log.endpoint,
         ]);
 
-   // console.log(values)
+   console.log(values)
 
   await db.query(
     `INSERT INTO logs (api_id, user_email , timestamp, method, response_code, ip_address, country, city, endpoint)
