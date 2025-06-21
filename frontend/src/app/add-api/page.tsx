@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
+import Loader from "@/components/Loader"
 export default function AddAPI() {
   const router = useRouter()
   const { data: session } = useSession()
@@ -21,7 +21,7 @@ export default function AddAPI() {
   const [apiType, setApiType] = useState<"server" | "serverless" | null>(null)
   const [plan, setPlan] = useState<"free" | "pro" | null>(null)
   const [copied, setCopied] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   // Pre-written SDK integration code
   const sdkIntegrationCode = `// SaaS Monitor SDK Integration
 const { SaasMonitor } = require('@saas-monitor/sdk');
@@ -66,7 +66,7 @@ console.log('${apiName || "API"} monitoring started successfully!');`
       const userId = userRes.data.id
 
       console.log(userId)
-
+  setLoading(true)
       const response = await axios.post("http://localhost:5000/api/apis", {
         user_id: userId,
         name: apiName,
@@ -75,7 +75,7 @@ console.log('${apiName || "API"} monitoring started successfully!');`
         plan: plan,
         // No sdk_code sent to backend
       })
-
+  setLoading(false)
       if (response.status === 201 || response.status === 200) {
         router.push("/dashboard")
       } else {
@@ -83,6 +83,7 @@ console.log('${apiName || "API"} monitoring started successfully!');`
       }
     } catch (error) {
       console.error("Error creating API:", error)
+        setLoading(false)
     }
   }
 
@@ -113,7 +114,13 @@ console.log('${apiName || "API"} monitoring started successfully!');`
 
   // Updated form validation - no longer requires SDK code input
   const isFormValid = apiName && apiUrl && apiType && plan
-
+if(loading)
+    {
+      return(
+       <div >
+        <Loader/>
+        </div> )
+    }
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}

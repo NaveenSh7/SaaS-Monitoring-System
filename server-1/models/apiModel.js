@@ -18,14 +18,14 @@ const getAllApis = async () => {
 // Create new API and insert initial uptime entry
 const createApi = async (apiData) => {
   try {
-    const { user_id, name, url, api_type, plan } = apiData
+    const { user_id, name, url, api_type, plan, api_key } = apiData
 
     // 1. Insert into apis table
     const result = await db.query(
-      `INSERT INTO apis (user_id, name, url, api_type, plan) 
-       VALUES ($1, $2, $3, $4, $5) 
+      `INSERT INTO apis (user_id, name, url, api_type, plan,api_key) 
+       VALUES ($1, $2, $3, $4, $5,$6) 
        RETURNING *`,
-      [user_id, name, url, api_type, plan]
+      [user_id, name, url, api_type, plan, api_key]
     )
 
     const newApi = result.rows[0]

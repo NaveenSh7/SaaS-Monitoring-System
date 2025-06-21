@@ -8,8 +8,10 @@ router.post('/logs' , async (req,res)=>{
       console.log("agaya mei")
      try {
         const rawLogs = req.body;
-        var apiSecret = req.headers['x-api-secret'];
-        //   if (secret !== YOUR_EXPECTED_SECRET) return res.status(403).send('Forbidden');
+        var api_key = req.headers['x-api-secret'];
+        
+       const { rows } = await db.query('SELECT id FROM apis WHERE api_key = $1', [api_key]);
+       const api_id = rows[0]?.id;
         
         const enrichedLogs = rawLogs.map(log => {
           const geo = geoip.lookup(log.ip || '') || {};
@@ -23,7 +25,7 @@ router.post('/logs' , async (req,res)=>{
         console.log(enrichedLogs)
         
         const values = enrichedLogs.map(log => [
-          apiSecret,
+          api_id,
           "example@gmail.com",
             new Date(log.timestamp).toISOString(),
           log.method,

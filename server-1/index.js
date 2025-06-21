@@ -10,6 +10,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/userRoute');
 const apiRoutes = require ('./routes/apiRoute');
 const uptimeRoutes = require('./routes/uptimeRoute');
+const dashbaordRoutes = require('./routes/dashboardRoute');
 const PORT = process.env.PORT || 5000;
 
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/apis', apiRoutes);
 app.use('/api/uptime', uptimeRoutes);
+app.use('/api/dashboard', dashbaordRoutes);
 
 // Health check
 app.get('/', (req, res) => {

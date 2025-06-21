@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/Navbar"
 import ApiStatusChart from '../uptime/page';
-
+import Loader from "@/components/Loader"
 interface ApiData {
   id: string
   name: string
@@ -129,6 +129,14 @@ useEffect(() => {
     }
   }
 
+
+  if(loading)
+    {
+      return(
+       <div >
+        <Loader/>
+        </div> )
+    }
   return (
     <div className="min-h-screen bg-black text-white px-4">
       <Navbar />

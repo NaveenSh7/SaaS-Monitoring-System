@@ -2,9 +2,12 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { signIn, signOut, useSession } from "next-auth/react";
-
+import { useState } from "react";
 import Link from "next/link"
 import Image from "next/image"
+import Loader from "@/components/Loader"
+ 
+
 import {
   Activity,
   AlertCircle,
@@ -21,7 +24,15 @@ import {
 
 export default function Navbar (){
     const { data: session } = useSession();
+ const [loading, setLoading] = useState(false)
 
+  if(loading)
+    {
+      return(
+       <div >
+        <Loader/>
+        </div> )
+    }
 return(
 <>
  {/* Navbar */}
@@ -56,8 +67,10 @@ return(
       Dashboard
     </Link>
     <Button
-      onClick={() => {
-        signOut();
+      onClick={ async () => {
+       setLoading(true);
+        await signOut();
+        setLoading(false);
       }}
       className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white "
     >
@@ -65,12 +78,20 @@ return(
     </Button>
   </div> </>) : (  <div className="flex items-center gap-4">
             <Button 
-                onClick={ ()=>{ signIn("google") } }
+                onClick={ async ()=>{ 
+                  setLoading(true);
+                await  signIn("google") 
+                setLoading(false);
+              } }
                 className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white">
               Login
             </Button>
             <Button 
-                onClick={ ()=>{ signIn("google") } }
+               onClick={ async ()=>{ 
+                  setLoading(true);
+                await  signIn("google") 
+                setLoading(false);
+              } }
             className="bg-emerald-600 hover:bg-emerald-700">Sign Up Free</Button>
           </div>) }
         

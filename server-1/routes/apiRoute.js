@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getAllApis, createApi, getApi, updateApi } = require('../models/apiModel');
+const crypto = require('crypto');
 
 // GET all apis
 router.get('/all', async (req, res) => {
@@ -18,6 +19,12 @@ router.get('/all', async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { user_id, name, url, api_type, plan } = req.body
+
+   const api_key =  crypto.randomBytes(20)
+    .toString('base64')       // Convert to base64
+    .replace(/[^a-zA-Z0-9]/g, '') // Remove non-alphanumeric
+    .slice(0, 20);        // Trim to required length - 20
+console.log(api_key)
 
     // Validate required fields
     if (!user_id || !name || !url || !api_type || !plan) {
@@ -46,6 +53,7 @@ router.post("/", async (req, res) => {
       url,
       api_type,
       plan,
+      api_key
     })
     
     res.status(201).json({
