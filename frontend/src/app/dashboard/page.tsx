@@ -30,8 +30,29 @@ type ApiEvent = {
   ended_at: string | null;
 };
 
+type DashData ={
+total_requests : number;
+countries : CountriesData[];
+ cities : CitiesData[];
+ endpoints : EndpointsData[];
+ timestamps : TimestampData[];
+}
 
-
+type CountriesData ={
+   country: string,
+    count:  number;
+}
+type CitiesData ={
+   city: string,
+    count:  number;
+}
+type EndpointsData ={
+   endpoint: string,
+    count:  number;
+}
+interface TimestampData {
+  timestamp: string; 
+}
 
 export default function Dashboard() {
   const router = useRouter()
@@ -40,7 +61,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
   const [uptimes, setUptimes] = useState<ApiEvent[]>([]); 
-
+ const [dashboardData, setdashboardData] = useState<DashData[]>([]); 
 
   // Fetch APIs for the logged-in user
 
@@ -98,7 +119,23 @@ useEffect(() => {
   fetchUptimes();
 }, [selectedAPI]);
 
+useEffect(() => {
+  const fetchDashboard = async () => {
+    if (!selectedAPI) return;
 
+    try {
+      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
+      const data = await response.json();
+      setdashboardData(data);
+      console.log(dashboardData)
+      console.log("Fetched uptimes for API", uptimes);
+    } catch (error) {
+      console.error("Error fetching uptimes:", error);
+    }
+  };
+
+  fetchDashboard();
+}, [selectedAPI]);
 
 
   const selectedAPIData = apis.find((api) => api.id === selectedAPI);

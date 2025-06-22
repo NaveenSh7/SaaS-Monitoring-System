@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
-
+const moment = require('moment-timezone');
 
 
 router.get('/' , async (req,res)=>{
@@ -14,12 +14,18 @@ router.get('/' , async (req,res)=>{
     const countries = await db.query('SELECT country, COUNT(*) FROM logs WHERE api_id = $1 GROUP BY country ORDER BY count DESC', [api_id]);
     const cities = await db.query('SELECT city, COUNT(*) FROM logs WHERE api_id = $1 GROUP BY city ORDER BY count DESC', [api_id]);
     const endpoints = await db.query('SELECT endpoint, COUNT(*) FROM logs WHERE api_id = $1 GROUP BY endpoint ORDER BY count DESC', [api_id]);
+   
+const timestamps = await db.query(
+  'SELECT timestamp FROM logs WHERE api_id = $1 AND timestamp >= NOW() - INTERVAL \'7 days\' ORDER BY timestamp  DESC',
+  [api_id]
+);
 
     res.json({
       total_requests: parseInt(totalReq.rows[0].total),
       countries: countries.rows,
       cities: cities.rows,
-      endpoints: endpoints.rows
+      endpoints: endpoints.rows,
+      timestamps : timestamps.rows
     });
     
 
