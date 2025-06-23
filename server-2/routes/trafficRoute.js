@@ -27,7 +27,7 @@ router.post('/logs' , async (req,res)=>{
         const values = enrichedLogs.map(log => [
           api_id,
           "example@gmail.com",
-            new Date(log.timestamp).toISOString(),
+                 new Date(log.timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
           log.method,
           log.statusCode,
           log.ip,
