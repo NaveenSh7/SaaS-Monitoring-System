@@ -40,9 +40,6 @@ const CountryData: FC<Props> = ({ countries }) => {
     label: c.country,
     value: c.count,
   }));
-
-  console.log("34343434");
-  console.log(countries);
   
 
   const labels = formatted.map((d) => d.label);

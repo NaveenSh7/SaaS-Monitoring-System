@@ -10,13 +10,14 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/Navbar"
-import ApiStatusChart from '../uptime/page';
+import UptimeChart from '@/components/charts/Uptime';
 import CountryData from '@/components/CountryData';
 import CityData from '@/components/CityData';
 import Loader from "@/components/Loader"
 import EndpointChart from "@/components/charts/EndpointChart"
 import TrafficChart from "@/components/charts/TrafficChart"
 import InfoChart from "@/components/charts/InfoChart"
+
 interface ApiData {
   id: string
   name: string
@@ -65,7 +66,7 @@ export default function Dashboard() {
   const [apis, setApis] = useState<ApiData[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
-  const [uptimes, setUptimes] = useState<ApiEvent[]>([]); 
+  const [uptimes, setUptimes] = useState<UptimeData[]>([]); 
   const [countries, setCountries] = useState<CountriesData[]>([]); 
   const [cities, setCities] = useState<CitiesData[]>([]); 
  const [dashboardData, setdashboardData] = useState<DashData[]>([]); 
@@ -134,9 +135,8 @@ useEffect(() => {
     try {
       const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
       const data = await response.json();
+      
       setdashboardData(data);
-      setCountries(data.countries || []);
-      setCities(data.cities || []);
     } catch (error) {
       console.error("Error fetching uptimes:", error);
     }
@@ -292,44 +292,32 @@ useEffect(() => {
 
 {/* // EndpointChart & Traffic value chart */}
 
-<div className="flex flex-col lg:flex-row gap-20 justify-center items-stretch w-full px-4 mt-10">
-
-    <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/2 ">
-    <div className="p-4 text-white">
-      <h1 className="text-xl font-bold mb-4">Traffic</h1>
-      <TrafficChart timestamps={dashboardData?.timestamps || []} />
-    </div>
-    </Card>
-
-  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/3 ">
-    <div className="p-4  text-white">
-      <h1 className="text-xl font-bold mb-4">Endpoints Usage Pie Chart</h1>
-      <EndpointChart data={dashboardData?.endpoints || []} />
-    </div>
-  </Card>
-  
-</div>
-
-
-
-{/* uptime charts */}
 <div className="grid gap-6 lg:grid-cols-2 w-full ml-4">
+  
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
     <CardHeader className="pb-2">
       <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
         <LineChart className="h-5 w-5 text-emerald-500" />
-        Response Time Trends
+        Traffic
       </CardTitle>
     </CardHeader>
     <CardContent className="h-[350px] p-4 pt-0">
-      {/* Conditional rendering with fallback text */}
-      {uptimes.length > 0 ? (
-      <UptimeChart data={uptimes} />
-      ) : (
-        <div className="text-sm text-zinc-400 italic mt-10 text-center">
-          No uptime data available.
-        </div>
-      )}
+      
+        <TrafficChart timestamps={dashboardData?.timestamps || []} />
+      
+    </CardContent>
+  </Card>
+  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+    <CardHeader className="pb-2">
+      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+        <LineChart className="h-5 w-5 text-emerald-500" />
+        Endpoints Usage Pie Chart
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="h-[350px] p-4 pt-0 m-auto">
+      
+        <EndpointChart data={dashboardData?.endpoints || []} />
+      
     </CardContent>
   </Card>
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
@@ -341,7 +329,7 @@ useEffect(() => {
     </CardHeader>
     <CardContent className="h-[350px] p-4 pt-0">
       
-        <CountryData countries={countries} />
+        <CountryData countries={dashboardData?.countries} />
       
     </CardContent>
   </Card>
@@ -354,7 +342,7 @@ useEffect(() => {
     </CardHeader>
     <CardContent className="h-[350px] p-4 pt-0">
       
-        <CityData cities={cities} />
+        <CityData cities={dashboardData?.cities} />
       
     </CardContent>
   </Card>
