@@ -3,6 +3,14 @@ const router = express.Router();
 const geoip = require('geoip-lite');
 const db = require('../db');
 
+// Helper to convert UTC to ISO string in IST
+function toISTISOString(utcString) {
+  const istDate = new Date(
+    new Date(utcString).toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+  );
+  return istDate.toISOString(); // PostgreSQL-friendly
+}
+
 //Add log-data
 router.post('/logs' , async (req,res)=>{
       console.log("agaya mei")
@@ -19,6 +27,7 @@ router.post('/logs' , async (req,res)=>{
             ...log,
             country: geo.country || null,
             city: geo.city || null,
+                istTimestamp: toISTISOString(log.timestamp),   
           };
         });
         
@@ -27,7 +36,7 @@ router.post('/logs' , async (req,res)=>{
         const values = enrichedLogs.map(log => [
           api_id,
           "example@gmail.com",
-            new Date(log.timestamp).toISOString(),
+                 log.istTimestamp, // IST ISO format
           log.method,
           log.statusCode,
           log.ip,

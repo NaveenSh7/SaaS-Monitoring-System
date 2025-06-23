@@ -76,7 +76,7 @@ router.get('/' , async (req,res)=>{
     const {api_id } = req.query;
     
     const result = await db.query(
-        'SELECT * FROM uptimes WHERE api_id = $1',
+        'SELECT * FROM uptimes WHERE api_id = $1 ORDER BY id DESC',
         [api_id]
       );
     res.json(result.rows);

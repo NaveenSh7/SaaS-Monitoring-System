@@ -14,6 +14,9 @@ import ApiStatusChart from '../uptime/page';
 import CountryData from '@/components/CountryData';
 import CityData from '@/components/CityData';
 import Loader from "@/components/Loader"
+import EndpointChart from "@/components/charts/EndpointChart"
+import TrafficChart from "@/components/charts/TrafficChart"
+import InfoChart from "@/components/charts/InfoChart"
 interface ApiData {
   id: string
   name: string
@@ -23,7 +26,7 @@ interface ApiData {
   status?: string // We'll assign this randomly for demo
 }
 
-type ApiEvent = {
+type UptimeData = {
   id: number;
   api_id: number;
   status: 'up' | 'down';
@@ -50,7 +53,7 @@ type CitiesData ={
 }
 type EndpointsData ={
    endpoint: string,
-    count:  number;
+    count:  number | string;
 }
 interface TimestampData {
   timestamp: string; 
@@ -179,6 +182,8 @@ useEffect(() => {
         <Loader/>
         </div> )
     }
+
+     
   return (
     <div className="min-h-screen bg-black text-white px-4">
       <Navbar />
@@ -279,56 +284,36 @@ useEffect(() => {
         {/* Monitoring Dashboard - Only show if an API is selected */}
         {selectedAPIData && (
           <div className="grid gap-6">
-            {/* Key Metrics Row */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">Uptime</CardTitle>
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-emerald-500">99.9%</div>
-                  <p className="text-xs text-zinc-400">Last 30 days</p>
-                </CardContent>
-              </Card>
+            {/* Key Infos Row */}
+           <InfoChart Uptime={uptimes} />
 
-              <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">Avg Response Time</CardTitle>
-                  <Clock className="h-4 w-4 text-blue-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-blue-500">245ms</div>
-                  <p className="text-xs text-zinc-400">-12ms from yesterday</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">Total Requests</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-purple-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-purple-500">1.2M</div>
-                  <p className="text-xs text-zinc-400">+15% from last week</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-white">Error Rate</CardTitle>
-                  <AlertCircle className="h-4 w-4 text-red-500" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-red-500">0.1%</div>
-                  <p className="text-xs text-zinc-400">-0.05% from yesterday</p>
-                </CardContent>
-              </Card>
-            </div>
 
             {/* Charts Row */}
 
-<div className="grid gap-6 lg:grid-cols-2 w-full">
+{/* // EndpointChart & Traffic value chart */}
+
+<div className="flex flex-col lg:flex-row gap-20 justify-center items-stretch w-full px-4 mt-10">
+
+    <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/2 ">
+    <div className="p-4 text-white">
+      <h1 className="text-xl font-bold mb-4">Traffic</h1>
+      <TrafficChart timestamps={dashboardData?.timestamps || []} />
+    </div>
+    </Card>
+
+  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/3 ">
+    <div className="p-4  text-white">
+      <h1 className="text-xl font-bold mb-4">Endpoints Usage Pie Chart</h1>
+      <EndpointChart data={dashboardData?.endpoints || []} />
+    </div>
+  </Card>
+  
+</div>
+
+
+
+{/* uptime charts */}
+<div className="grid gap-6 lg:grid-cols-2 w-full ml-4">
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
     <CardHeader className="pb-2">
       <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
@@ -339,7 +324,7 @@ useEffect(() => {
     <CardContent className="h-[350px] p-4 pt-0">
       {/* Conditional rendering with fallback text */}
       {uptimes.length > 0 ? (
-        <ApiStatusChart data={uptimes} />
+      <UptimeChart data={uptimes} />
       ) : (
         <div className="text-sm text-zinc-400 italic mt-10 text-center">
           No uptime data available.
@@ -374,6 +359,11 @@ useEffect(() => {
     </CardContent>
   </Card>
 </div>
+
+
+
+
+
 
 
             {/* Recent Activity */}

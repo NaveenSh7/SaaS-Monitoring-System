@@ -30,7 +30,7 @@ type Props = {
   data: ApiEvent[];
 };
 
-export default function ApiStatusChart({ data }: Props) {
+export default function UptimeChart({ data }: Props) {
   const [range, setRange] = useState<'24h' | '7d'>('24h');
   const now = moment();
 
@@ -80,7 +80,7 @@ export default function ApiStatusChart({ data }: Props) {
       x: {
         type: 'time' as const,
         time: {
-          unit: 'minute',
+          unit: 'minute' as 'minute',
           tooltipFormat: 'HH:mm:ss',
         },
         title: {
