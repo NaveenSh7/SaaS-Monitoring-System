@@ -66,7 +66,7 @@ export default function TrafficChart({ timestamps }: { timestamps: Timestamp[] }
     <div className="w-full">
       <div className="flex justify-end mb-4">
         <select
-          className="border px-2 py-1 rounded "
+          className="border px-2 py-1 rounded bg-gray-200"
           value={mode}
           onChange={(e) => setMode(e.target.value as "24hrs" | "7days")}
         >
