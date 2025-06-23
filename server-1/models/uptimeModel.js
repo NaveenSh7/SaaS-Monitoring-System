@@ -29,7 +29,7 @@ const updateUptime = async (id) => {
 const getUptime = async (api_id)=>{
    
 const result = await db.query(
-    'SELECT * FROM uptimes WHERE api_id = $1 ',[api_id]
+    'SELECT * FROM uptimes WHERE api_id = $1 ORDER BY id DESC',[api_id]
 );
 
      return result.rows;
