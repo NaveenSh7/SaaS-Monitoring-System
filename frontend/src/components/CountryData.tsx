@@ -1,41 +1,104 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import axios from "axios";
-import ChartCard from "@/components/ui/ChartCard";
+import { FC } from "react";
+import { Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  ChartOptions,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-interface Props {
-  api_id: string | null;
-}
+// Register Chart.js components
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-interface CountryData {
+interface CountryDataItem {
   country: string;
   count: string | number;
 }
 
-export default function CountryData({ api_id }: Props) {
-  const [countries, setCountries] = useState<CountryData[]>([]);
+interface Props {
+  countries: CountryDataItem[];
+}
 
-  useEffect(() => {
-    if (!api_id) return;
+// Helper function for colors
+const generateColors = (count: number): string[] => {
+  const colors: string[] = [];
 
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`http://localhost:5000/api/dashboard?api_id=${api_id}`);
-        setCountries(res.data.countries || []);
-      } catch (err) {
-        console.error("Failed to fetch countries:", err);
-      }
-    };
+  for (let i = 0; i < count; i++) {
+    const hue = Math.floor((360 / count) * i);
+    colors.push(`hsl(${hue}, 70%, 70%)`);
+  }
 
-    fetchData();
-  }, [api_id]);
+  return colors;
+};
 
-  // Transform to generic format for ChartCard
+const CountryData: FC<Props> = ({ countries }) => {
   const formatted = countries.map((c) => ({
     label: c.country,
     value: c.count,
   }));
 
-  return <ChartCard title="Country" data={formatted} />;
-}
+  console.log("34343434");
+  console.log(countries);
+  
+
+  const labels = formatted.map((d) => d.label);
+  const values = formatted.map((d) => Number(d.value));
+  const colors = generateColors(formatted.length);
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: "Count",
+        data: values,
+        backgroundColor: colors,
+        borderColor: "#fff",
+        borderWidth: 2,
+        hoverOffset: 8,
+      },
+    ],
+  };
+
+  const options: ChartOptions<"doughnut"> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          color: "#FFFFFF",
+          font: { size: 12 },
+        },
+      },
+      datalabels: {
+        color: "#fff",
+        font: { weight: "bold", size: 12 },
+        formatter: (value: number) => `${value}`,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.label}: ${context.parsed}`,
+        },
+      },
+    },
+  };
+
+  if (formatted.length === 0) {
+    return (
+      <div className="text-sm text-zinc-400 italic mt-10 text-center">
+        No country data available.
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-[350px] mx-auto">
+      <Doughnut data={chartData} options={options} />
+    </div>
+  );
+};
+
+export default CountryData;
