@@ -62,7 +62,9 @@ router.post('/logs' , async (req,res)=>{
         res.status(200).json({message:'error during logs receive and store'});
         // console.log(err,"coudnt save user")
         console.log(err)
-     }
+     } finally {
+    client.release(); // ✅ Always release the client
+  }
 
 })
 
