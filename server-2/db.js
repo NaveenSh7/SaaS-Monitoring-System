@@ -3,16 +3,14 @@ require('dotenv').config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-  max: 5, // ✅ Set a safe pool size for Supabase Free/Pro tier
-  idleTimeoutMillis: 30000, // Optional: close idle connections
-  connectionTimeoutMillis: 4000 // Optional: fail if not connected in 2s
+  max: 5, // Safe for Supabase Free tier
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+  ssl: { rejectUnauthorized: false },
 });
 
 pool.on('connect', () => {
-  console.log('✅ PostgreSQL connected with server-2');
+  console.log('✅ Connected to Supabase via Session Pooler');
 });
 
 pool.on('error', (err) => {
