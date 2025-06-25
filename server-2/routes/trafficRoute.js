@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const geoip = require('geoip-lite');
-const db = require('../db');
+const pool = require('../db');
 
 // Helper to convert UTC to ISO string in IST
 function toISTISOString(utcString) {
@@ -18,7 +18,7 @@ router.post('/logs' , async (req,res)=>{
         const rawLogs = req.body;
         var api_key = req.headers['x-api-secret'];
            
-          const { rows } = await db.query('SELECT id FROM apis WHERE api_key = $1', [api_key]);
+          const { rows } = await pool.query('SELECT id FROM apis WHERE api_key = $1', [api_key]);
        const api_id = rows[0]?.id;
         
         const enrichedLogs = rawLogs.map(log => {
@@ -47,7 +47,7 @@ router.post('/logs' , async (req,res)=>{
 
    console.log(values)
 
-  await db.query(
+  await pool.query(
     `INSERT INTO logs (api_id, user_email , timestamp, method, response_code, ip_address, country, city, endpoint)
      VALUES ${values.map((_, i) => `($${i * 9 + 1}, $${i * 9 + 2}, $${i * 9 + 3}, $${i * 9 + 4}, $${i * 9 + 5}, $${i * 9 + 6}, $${i * 9 + 7}, $${i * 9 + 8}, $${i * 9 + 9})`).join(', ')}
     `,
