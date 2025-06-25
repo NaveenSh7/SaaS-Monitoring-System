@@ -14,6 +14,8 @@ function toISTISOString(utcString) {
 //Add log-data
 router.post('/logs' , async (req,res)=>{
       console.log("agaya mei")
+    const client = await pool.connect(); // ✅ use a dedicated client
+
      try {
         const rawLogs = req.body;
         var api_key = req.headers['x-api-secret'];
