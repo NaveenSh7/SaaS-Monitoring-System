@@ -10,6 +10,7 @@ import {
   ChartOptions,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { count } from "console";
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
@@ -36,7 +37,9 @@ const generateColors = (count: number): string[] => {
 };
 
 const CountryData: FC<Props> = ({ countries }) => {
-  const formatted = countries.map((c) => ({
+  {countries}
+  
+  const formatted = (countries ?? []).map((c) => ({
     label: c.country,
     value: c.count,
   }));

@@ -133,7 +133,7 @@ useEffect(() => {
     if (!selectedAPI) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
+      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${24}`);
       const data = await response.json();
       
       setdashboardData(data);
