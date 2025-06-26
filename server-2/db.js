@@ -1,15 +1,21 @@
-const { Client } = require('pg');
+const { Pool } = require('pg');
 require('dotenv').config();
 
-const client = new Client({
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  max: 5, // Safe for Supabase Free tier
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+  ssl: { rejectUnauthorized: false },
 });
 
-client.connect()
-  .then(() => console.log('✅ PostgreSQL connected with server-2'))
-  .catch((err) => console.error('❌ Connection error:', err.stack));
+pool.on('connect', () => {
+  console.log('✅ Connected to Supabase via Session Pooler');
+});
 
-module.exports = client;
+pool.on('error', (err) => {
+  console.error('❌ Unexpected PostgreSQL error', err);
+});
+
+module.exports = pool;
+

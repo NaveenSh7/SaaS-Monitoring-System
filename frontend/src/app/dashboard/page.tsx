@@ -17,6 +17,7 @@ import Loader from "@/components/Loader"
 import EndpointChart from "@/components/charts/EndpointChart"
 import TrafficChart from "@/components/charts/TrafficChart"
 import InfoChart from "@/components/charts/InfoChart"
+
 interface ApiData {
   id: string
   name: string
@@ -66,7 +67,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
   const [uptimes, setUptimes] = useState<UptimeData[]>([]); 
- const [dashboardData, setdashboardData] = useState<DashData | null>(null); 
+  const [countries, setCountries] = useState<CountriesData[]>([]); 
+  const [cities, setCities] = useState<CitiesData[]>([]); 
+ const [dashboardData, setdashboardData] = useState<DashData[]>([]); 
 
   // Fetch APIs for the logged-in user
 
@@ -115,7 +118,8 @@ useEffect(() => {
       const response = await fetch(`http://localhost:5000/api/uptime?api_id=${selectedAPI}`);
       const data = await response.json();
       setUptimes(data);
-      // console.log("Fetched uptimes for API", uptimes);
+      console.log(data.countries);
+      
     } catch (error) {
       console.error("Error fetching uptimes:", error);
     }
@@ -129,11 +133,10 @@ useEffect(() => {
     if (!selectedAPI) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
+      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${24}`);
       const data = await response.json();
+      
       setdashboardData(data);
-   
-      // console.log("Fetched uptimes for API", uptimes);
     } catch (error) {
       console.error("Error fetching uptimes:", error);
     }
@@ -323,15 +326,9 @@ useEffect(() => {
       </CardTitle>
     </CardHeader>
     <CardContent className="h-[350px] p-4 pt-0">
-      {/* Conditional rendering with fallback text */}
-      {uptimes.length > 0 && selectedAPI !== null ? (
-        <CountryData api_id={selectedAPI} />
-      ) : (
-        <div className="text-sm text-zinc-400 italic mt-10 text-center">
-          No uptime data available.
-        </div>
-      )}
-
+      
+        <CountryData countries={dashboardData?.countries} />
+      
     </CardContent>
   </Card>
 
@@ -343,15 +340,9 @@ useEffect(() => {
       </CardTitle>
     </CardHeader>
     <CardContent className="h-[350px] p-4 pt-0">
-      {/* Conditional rendering with fallback text */}
-      {uptimes.length > 0 && selectedAPI !== null ? (
-        <CityData api_id={selectedAPI} />
-      ) : (
-        <div className="text-sm text-zinc-400 italic mt-10 text-center">
-          No uptime data available.
-        </div>
-      )}
-
+      
+        <CityData cities={dashboardData?.cities} />
+      
     </CardContent>
   </Card>
 </div>

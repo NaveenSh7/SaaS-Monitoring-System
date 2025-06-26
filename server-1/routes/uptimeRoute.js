@@ -75,11 +75,26 @@ router.get('/' , async (req,res)=>{
  
     const {api_id } = req.query;
     
-    const result = await db.query(
-        'SELECT * FROM uptimes WHERE api_id = $1 ORDER BY id DESC',
+    const hours = await db.query(
+        'SELECT status, ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(ended_at, NOW()) - started_at)) / 3600), 2)AS total_hours FROM uptimes WHERE api_id=$1 GROUP BY status',
         [api_id]
       );
-    res.json(result.rows);
+    const status = await db.query(
+      'SELECT status FROM uptimes WHERE api_id=$1 AND ended_at is NULL ORDER BY started_at DESC LIMIT 1',[api_id]
+    );
+
+    const timestamps = await db.query(`
+      SELECT 
+        status,
+        started_at + INTERVAL '5 hours 30 minutes' as started_at,
+        COALESCE(ended_at, NOW()) + INTERVAL '5 hours 30 minutes' as ended_at
+      FROM uptimes 
+      WHERE api_id = $1 
+        AND COALESCE(ended_at, NOW()) >= NOW() - INTERVAL '7 days'
+      ORDER BY COALESCE(ended_at, NOW()) DESC
+    `, [api_id]);
+
+    res.json({hours:hours.rows,status:status.rows,timestamps:timestamps.rows});
 
   } catch (error) {
         res.status(500).json({ message: 'Error fetching uptimes' });

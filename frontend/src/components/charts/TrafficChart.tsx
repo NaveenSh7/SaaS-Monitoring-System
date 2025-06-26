@@ -34,12 +34,14 @@ export default function TrafficChart({ timestamps }: { timestamps: Timestamp[] }
 
     timestamps.forEach(({ timestamp }) => {
       const date = new Date(timestamp);
-
-      if (mode === "24hrs") {
+      const curr = new Date();
+      
+      if (mode === "24hrs" && (curr.getTime() - date.getTime()) <= 24 * 60 * 60 * 1000) {
         const hour = date.getHours();
         counts[hour]++;
-      } else {
-        const today = new Date();
+      }
+      else if(mode === "7days"){
+          const today = new Date();
         today.setHours(0, 0, 0, 0);
         const tsDate = new Date(date);
         tsDate.setHours(0, 0, 0, 0);
@@ -66,7 +68,7 @@ export default function TrafficChart({ timestamps }: { timestamps: Timestamp[] }
     <div className="w-full">
       <div className="flex justify-end mb-4">
         <select
-          className="border px-2 py-1 rounded "
+          className="border px-2 py-1 rounded bg-gray-200"
           value={mode}
           onChange={(e) => setMode(e.target.value as "24hrs" | "7days")}
         >
