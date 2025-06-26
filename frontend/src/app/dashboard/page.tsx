@@ -69,7 +69,7 @@ export default function Dashboard() {
   const [uptimes, setUptimes] = useState<UptimeData[]>([]); 
   const [countries, setCountries] = useState<CountriesData[]>([]); 
   const [cities, setCities] = useState<CitiesData[]>([]); 
- const [dashboardData, setdashboardData] = useState<DashData[]>([]); 
+ const [dashboardData, setdashboardData] = useState<DashData | null>(null); 
 
   // Fetch APIs for the logged-in user
 
@@ -133,7 +133,7 @@ useEffect(() => {
     if (!selectedAPI) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${24}`);
+      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
       const data = await response.json();
       
       setdashboardData(data);
@@ -327,7 +327,7 @@ useEffect(() => {
     </CardHeader>
     <CardContent className="h-[350px] p-4 pt-0">
       
-        <CountryData countries={dashboardData?.countries} />
+        <CountryData countries={dashboardData?.countries || []} />
       
     </CardContent>
   </Card>
@@ -341,7 +341,7 @@ useEffect(() => {
     </CardHeader>
     <CardContent className="h-[350px] p-4 pt-0">
       
-        <CityData cities={dashboardData?.cities} />
+        <CityData cities={dashboardData?.cities || []} />
       
     </CardContent>
   </Card>
