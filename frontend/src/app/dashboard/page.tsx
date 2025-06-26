@@ -315,9 +315,34 @@ useEffect(() => {
 {/* uptime charts */}
 
 <div className="grid gap-6 lg:grid-cols-2 w-full ml-4">
-
-
   
+  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+    <CardHeader className="pb-2">
+      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+        <LineChart className="h-5 w-5 text-emerald-500" />
+        Traffic
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="h-[350px] p-4 pt-0">
+      
+        <TrafficChart timestamps={dashboardData?.timestamps || []} />
+      
+    </CardContent>
+  </Card>
+  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+    <CardHeader className="pb-2">
+      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+        <LineChart className="h-5 w-5 text-emerald-500" />
+        Endpoints Usage Pie Chart
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="h-[350px] p-4 pt-0 m-auto">
+      
+        <EndpointChart data={dashboardData?.endpoints || []} />
+     
+      
+    </CardContent>
+  </Card>
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
     <CardHeader className="pb-2">
       <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
