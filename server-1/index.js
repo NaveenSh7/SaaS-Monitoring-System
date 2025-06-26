@@ -38,9 +38,13 @@ app.get('/', (req, res) => {
 });
 
 // function : check up or down => 
+let isRunning = false;
+
 const checkApis = async () => {
+  if (isRunning) return; // skip this run
+  isRunning = true;
+
   try {
-    // call your own route `/api/apis` to get APIs
     const apisResponse = await axios.get(`http://localhost:${PORT}/api/apis/all`);
     const apis = apisResponse.data;
 
@@ -48,31 +52,31 @@ const checkApis = async () => {
       apis.map(async (api) => {
         try {
           var start = Date.now();
-        
           const response = await axios.get(api.url, { timeout: 4000 });
-  
           const status = response.status === 200 ? 'up' : 'down';
-         const  latency = Date.now() - start; 
-          // call your own route `/api/uptime` to update uptime status
+          const latency = Date.now() - start;
           await axios.put(`http://localhost:${PORT}/api/uptime`, {
             api_id: api.id,
             status,
-              latency:latency,
+            latency
           });
         } catch (err) {
-           const  latency = Date.now() - start; 
+          const latency = Date.now() - start;
           await axios.put(`http://localhost:${PORT}/api/uptime`, {
             api_id: api.id,
             status: 'down',
-            latency:latency,
+            latency
           });
         }
       })
     );
   } catch (err) {
     console.error('Failed to check APIs:', err);
+  } finally {
+    isRunning = false;
   }
 };
+
 
 setInterval(checkApis, 5000); // run every 5 seconds
 

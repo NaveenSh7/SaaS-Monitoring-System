@@ -45,7 +45,7 @@ router.put('/', async (req, res) => {
 
     const last = current.rows[0];
 
-    if (last.status === status) {
+   if (last.status.toLowerCase() === status.toLowerCase()) {
       // Same status, just update latency if you want
       await db.query(
         'UPDATE uptimes SET latency = $1 WHERE id = $2',
