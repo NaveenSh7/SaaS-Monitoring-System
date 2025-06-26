@@ -36,7 +36,7 @@ const generateColors = (count: number): string[] => {
 };
 
 const CityData: FC<Props> = ({ cities }) => {
-  const formatted = cities.map((c) => ({
+  const formatted = (cities ?? []).map((c) => ({
     label: c.city,
     value: c.count,
   }));
