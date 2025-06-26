@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/Navbar"
-import UptimeChart from '@/components/charts/Uptime';
+import UptimeChart from "@/components/charts/Uptime"
 import CountryData from '@/components/CountryData';
 import CityData from '@/components/CityData';
 import Loader from "@/components/Loader"
@@ -292,6 +292,28 @@ useEffect(() => {
 
 {/* // EndpointChart & Traffic value chart */}
 
+<div className="flex flex-col lg:flex-row gap-20 justify-center items-stretch w-full px-4 mt-10">
+
+    <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/2 ">
+    <div className="p-4 text-white">
+      <h1 className="text-xl font-bold mb-4">Traffic</h1>
+      <TrafficChart timestamps={dashboardData?.timestamps || []} />
+    </div>
+    </Card>
+
+  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/3 ">
+    <div className="p-4  text-white">
+      <h1 className="text-xl font-bold mb-4">Endpoints Usage Pie Chart</h1>
+      <EndpointChart data={dashboardData?.endpoints || []} />
+    </div>
+  </Card>
+  
+</div>
+
+
+
+{/* uptime charts */}
+
 <div className="grid gap-6 lg:grid-cols-2 w-full ml-4">
   
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
@@ -334,6 +356,7 @@ useEffect(() => {
       
     </CardContent>
   </Card>
+
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
     <CardHeader className="pb-2">
       <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
