@@ -317,6 +317,7 @@ useEffect(() => {
     <CardContent className="h-[350px] p-4 pt-0 m-auto">
       
         <EndpointChart data={dashboardData?.endpoints || []} />
+     
       
     </CardContent>
   </Card>
