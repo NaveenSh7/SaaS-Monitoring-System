@@ -308,6 +308,8 @@ useEffect(() => {
   <InfoChart
     StatusData={uptimes.status.status}
     HoursData={uptimes.hours}
+    LatencyData={uptimes.latency.latency}
+    TrafficData={dashboardData?.total_requests || ''}
   />
 )}
 
