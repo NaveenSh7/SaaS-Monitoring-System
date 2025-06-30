@@ -4,18 +4,25 @@ import { Activity, AlertCircle, CheckCircle2, Clock, Edit, LineChart, Server, Se
 import { Button } from "@/components/ui/button"
 import { useState } from "react";
 import { uptime } from "process";
-type UptimeData = {
-  id: number;
-  api_id: number;
-  status: 'up' | 'down';
-  latency: number | null;
-  started_at: string;
-  ended_at: string | null;
-};
 
-export default function InfoChart  ({ Uptime }: { Uptime: UptimeData[] }){
 
-  
+//trefg
+interface InfoProps {
+  StatusData: string;
+  HoursData: HoursData1[];
+}
+
+type HoursData1 = {
+  status : string;
+  total_hours : number | string;
+}
+
+
+
+export default function InfoChart  ( { StatusData, HoursData }: InfoProps ){
+
+  console.log(StatusData)
+  console.log(HoursData)
    
     return(
 
