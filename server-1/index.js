@@ -78,7 +78,7 @@ const checkApis = async () => {
 };
 
 
-setInterval(checkApis, 5000); // run every 5 seconds
+setInterval(checkApis, 15000); // run every 5 seconds
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

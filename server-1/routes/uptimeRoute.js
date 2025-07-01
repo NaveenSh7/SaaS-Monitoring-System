@@ -3,6 +3,7 @@ const router = express.Router();
 const {createUptime ,updateUptime,getUptime } = require('../models/uptimeModel');
 const moment = require('moment-timezone');
 const db = require('../db');
+const { sendMail } = require('../utils/mail'); 
 
 
 //Add new uptime
@@ -26,17 +27,17 @@ router.post('/' , async (req,res)=>{
 
 router.put('/', async (req, res) => {
   const { api_id, status, latency } = req.body;
- console.log(api_id)
+//  console.log(api_id)
   try {
     // Step 1: Get the last record with ended_at IS NULL
    
     const current = await db.query(
-      'SELECT * FROM uptimes WHERE api_id = $1 AND ended_at IS NULL ORDER BY started_at DESC LIMIT 1',
+      'SELECT * FROM uptimes WHERE api_id = $1 ORDER BY started_at DESC LIMIT 1',
       [api_id]
     );
 
     const now = moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
-
+    
     if (current.rows.length === 0) {
       // No previous open record → Insert new
       const inserted = await createUptime(api_id, status, latency);
@@ -44,6 +45,7 @@ router.put('/', async (req, res) => {
     }
 
     const last = current.rows[0];
+
 
    if (last.status.toLowerCase() === status.toLowerCase()) {
       // Same status, just update latency if you want
@@ -61,6 +63,38 @@ router.put('/', async (req, res) => {
     const inserted = await createUptime(api_id, status, latency);
 
     res.status(200).json({ message: 'Status changed, new row created', inserted });
+    
+    if (status.toLowerCase() === 'down') {
+      setTimeout(async () => {
+        try {         
+          const check = await db.query(
+            'SELECT * FROM uptimes WHERE api_id = $1 ORDER BY started_at DESC LIMIT 1',
+            [api_id]
+          );
+
+          if (check.rows.length && check.rows[0].status.toLowerCase() === 'down') {
+            // Fetch user email using api_id
+            const apiData = await db.query(
+              'SELECT users.email, apis.name, apis.url FROM apis JOIN users ON apis.user_id = users.id WHERE apis.id = $1',
+              [api_id]
+            );
+
+            if (apiData.rows.length) {
+              const { email, name, url } = apiData.rows[0];
+              // console.log(`Sending DOWN alert to ${email} for API "${name}" (${url})`);
+              await sendMail({
+                to: email,
+                subject: `⚠️ Alert: Your API "${name}" is Down`,
+                text: `Hi,\n\nWe have detected that your API (${url}) has been down for at least 20 seconds.\n\nPlease check your server.\n\nRegards,\nMonitoring Team`
+              });
+            }
+          }
+        } catch (mailErr) {
+          console.error('Failed to send down alert mail:', mailErr);
+        }
+      }, 20 * 1000); // 20 seconds
+    }
+
 
   } catch (err) {
     console.error('aaFailed to update uptime:', err);

@@ -67,9 +67,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
   const [uptimes, setUptimes] = useState<UptimeData[]>([]); 
-  const [countries, setCountries] = useState<CountriesData[]>([]); 
-  const [cities, setCities] = useState<CitiesData[]>([]); 
- const [dashboardData, setdashboardData] = useState<DashData | null>(null); 
+ const [dashboardData, setdashboardData] = useState<DashData[]>([]); 
 
   // Fetch APIs for the logged-in user
 
@@ -133,7 +131,7 @@ useEffect(() => {
     if (!selectedAPI) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
+      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${24}`);
       const data = await response.json();
       
       setdashboardData(data);
@@ -291,27 +289,6 @@ useEffect(() => {
             {/* Charts Row */}
 
 {/* // EndpointChart & Traffic value chart */}
-
-<div className="flex flex-col lg:flex-row gap-20 justify-center items-stretch w-full px-4 mt-10">
-
-    <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/2 ">
-    <div className="p-4 text-white">
-      <h1 className="text-xl font-bold mb-4">Traffic</h1>
-      <TrafficChart timestamps={dashboardData?.timestamps || []} />
-    </div>
-    </Card>
-
-  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl w-1/3 ">
-    <div className="p-4  text-white">
-      <h1 className="text-xl font-bold mb-4">Endpoints Usage Pie Chart</h1>
-      <EndpointChart data={dashboardData?.endpoints || []} />
-    </div>
-  </Card>
-  
-</div>
-
-
-
 {/* uptime charts */}
 
 <div className="grid gap-6 lg:grid-cols-2 w-full ml-4">
