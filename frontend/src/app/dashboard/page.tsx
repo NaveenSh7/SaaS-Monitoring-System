@@ -83,9 +83,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
   const [uptimes, setUptimes] = useState<UptimeData | null>(null);
-
-  const [countries, setCountries] = useState<CountriesData[]>([]); 
-  const [cities, setCities] = useState<CitiesData[]>([]); 
  const [dashboardData, setdashboardData] = useState<DashData | null>(null); 
 
   // Fetch APIs for the logged-in user
@@ -152,7 +149,7 @@ useEffect(() => {
     if (!selectedAPI) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${24}`);
+      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
       const data = await response.json();
 
       setdashboardData(data);
