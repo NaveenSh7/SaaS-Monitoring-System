@@ -2,7 +2,7 @@
 "use client";
 
 import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend ,ChartOptions } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -26,6 +26,35 @@ export default function EndpointChart({ data }: { data: EndpointData[] }) {
       },
     ],
   };
+  const options: ChartOptions<"pie"> = {
+    responsive: true,
+    plugins: {
+      legend: {
+       position: 'right',
+     
+        labels: {
+          color: "#FFFFFF",
+          font: { size: 12 },
+        },
+      },
+      datalabels: {
+        color: "#fff",
+        font: { weight: "bold", size: 12 },
+        formatter: (value: number) => `${value}`,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.label}: ${context.parsed}`,
+        },
+      },
+    },
+  };
 
-  return <Pie data={chartData} />;
+  return(<>
+     <div className=" h-96 w-96 mx-auto">
+      <Pie data={chartData} options={options}/>
+      </div>
+  </>)
+ 
+
 }

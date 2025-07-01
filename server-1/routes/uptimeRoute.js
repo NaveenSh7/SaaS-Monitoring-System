@@ -53,6 +53,8 @@ router.put('/', async (req, res) => {
         'UPDATE uptimes SET latency = $1 WHERE id = $2',
         [latency, last.id]
       );
+  
+
       return res.status(200).json({ message: 'Status unchanged' });
     }
 
@@ -116,7 +118,9 @@ router.get('/' , async (req,res)=>{
     const status = await db.query(
       'SELECT status FROM uptimes WHERE api_id=$1 AND ended_at is NULL ORDER BY started_at DESC LIMIT 1',[api_id]
     );
-
+      const latency = await db.query(
+      'SELECT latency FROM uptimes WHERE api_id=$1 AND ended_at is NULL ORDER BY started_at DESC LIMIT 1',[api_id]
+    );
     const timestamps = await db.query(`
       SELECT 
         status,
@@ -128,7 +132,7 @@ router.get('/' , async (req,res)=>{
       ORDER BY COALESCE(ended_at, NOW()) DESC
     `, [api_id]);
 
-    res.json({hours:hours.rows,status:status.rows,timestamps:timestamps.rows});
+    res.json({hours:hours.rows,status:status.rows[0],timestamps:timestamps.rows,latency:latency.rows[0]});
 
   } catch (error) {
         res.status(500).json({ message: 'Error fetching uptimes' });

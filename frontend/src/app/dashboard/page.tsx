@@ -10,14 +10,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Navbar from "@/components/Navbar"
-import UptimeChart from "@/components/charts/Uptime"
 import CountryData from '@/components/CountryData';
 import CityData from '@/components/CityData';
 import Loader from "@/components/Loader"
 import EndpointChart from "@/components/charts/EndpointChart"
 import TrafficChart from "@/components/charts/TrafficChart"
 import InfoChart from "@/components/charts/InfoChart"
-
+import UptimeChart from "@/components/charts/UptimeChart"
 interface ApiData {
   id: string
   name: string
@@ -27,18 +26,10 @@ interface ApiData {
   status?: string // We'll assign this randomly for demo
 }
 
-type UptimeData = {
-  id: number;
-  api_id: number;
-  status: 'up' | 'down';
-  latency: number | null;
-  started_at: string;
-  ended_at: string | null;
-};
 
 type DashData ={
-total_requests : number;
-countries : CountriesData[];
+  total_requests : number;
+  countries : CountriesData[];
  cities : CitiesData[];
  endpoints : EndpointsData[];
  timestamps : TimestampData[];
@@ -59,6 +50,31 @@ type EndpointsData ={
 interface TimestampData {
   timestamp: string; 
 }
+type UptimeData = {
+  status: StatusData;
+  hours: HoursData[]; // ✅ fixed this line
+  timestamps: UptimeStampData[];
+  latency: LatencyData;
+};
+
+type StatusData = {
+  status: string;
+};
+
+type HoursData = {
+  status: string;
+  total_hours: number | string;
+};
+
+type UptimeStampData = {
+  status: "up" | "down";
+  started_at: string;
+  ended_at: string | null;
+};
+
+type LatencyData = {
+  latency: number;
+};
 
 export default function Dashboard() {
   const router = useRouter()
@@ -66,13 +82,18 @@ export default function Dashboard() {
   const [apis, setApis] = useState<ApiData[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
-  const [uptimes, setUptimes] = useState<UptimeData[]>([]); 
- const [dashboardData, setdashboardData] = useState<DashData[]>([]); 
+  const [uptimes, setUptimes] = useState<UptimeData | null>(null);
+
+  const [countries, setCountries] = useState<CountriesData[]>([]); 
+  const [cities, setCities] = useState<CitiesData[]>([]); 
+ const [dashboardData, setdashboardData] = useState<DashData | null>(null); 
 
   // Fetch APIs for the logged-in user
 
 
     // fetch uptime of a perticular api
+
+    const selectedAPIData = apis.find((api) => api.id === selectedAPI);
 
 useEffect(() => {
   const fetchApis = async () => {
@@ -116,7 +137,7 @@ useEffect(() => {
       const response = await fetch(`http://localhost:5000/api/uptime?api_id=${selectedAPI}`);
       const data = await response.json();
       setUptimes(data);
-      console.log(data.countries);
+// console.log(data)
       
     } catch (error) {
       console.error("Error fetching uptimes:", error);
@@ -133,7 +154,7 @@ useEffect(() => {
     try {
       const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${24}`);
       const data = await response.json();
-      
+
       setdashboardData(data);
     } catch (error) {
       console.error("Error fetching uptimes:", error);
@@ -144,7 +165,6 @@ useEffect(() => {
 }, [selectedAPI]);
 
 
-  const selectedAPIData = apis.find((api) => api.id === selectedAPI);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -181,7 +201,7 @@ useEffect(() => {
         </div> )
     }
 
-     
+// console.log(uptimes)
   return (
     <div className="min-h-screen bg-black text-white px-4">
       <Navbar />
@@ -282,14 +302,26 @@ useEffect(() => {
         {/* Monitoring Dashboard - Only show if an API is selected */}
         {selectedAPIData && (
           <div className="grid gap-6">
+         
             {/* Key Infos Row */}
-           <InfoChart Uptime={uptimes} />
+{uptimes && (
+  <InfoChart
+    StatusData={uptimes.status.status}
+    HoursData={uptimes.hours}
+    LatencyData={uptimes.latency.latency}
+    TrafficData={dashboardData?.total_requests || ''}
+  />
+)}
 
 
             {/* Charts Row */}
 
 {/* // EndpointChart & Traffic value chart */}
-{/* uptime charts */}
+
+
+
+
+
 
 <div className="grid gap-6 lg:grid-cols-2 w-full ml-4">
   
@@ -306,6 +338,8 @@ useEffect(() => {
       
     </CardContent>
   </Card>
+
+
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
     <CardHeader className="pb-2">
       <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
@@ -313,13 +347,14 @@ useEffect(() => {
         Endpoints Usage Pie Chart
       </CardTitle>
     </CardHeader>
-    <CardContent className="h-[350px] p-4 pt-0 m-auto">
+    <CardContent className="h-[350px] pt-0 m-auto">
       
         <EndpointChart data={dashboardData?.endpoints || []} />
      
       
     </CardContent>
   </Card>
+
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
     <CardHeader className="pb-2">
       <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
@@ -347,13 +382,25 @@ useEffect(() => {
       
     </CardContent>
   </Card>
+
+
+
 </div>
+<div className="w-full ml-4">
+  {/* uptimes wala graph */}
+    {/* <Card className="w-full bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+  <CardHeader className="pb-2">
+    <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+      <LineChart className="h-5 w-5 text-emerald-500" />
+      Traffic
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="h-[350px] p-4 pt-0 w-full">
+    <UptimeChart timestamps={uptimes[0]?.timestamps || []} />
+  </CardContent>
+</Card> */}
 
-
-
-
-
-
+</div>
 
             {/* Recent Activity */}
             <Card className="bg-zinc-900 border-zinc-800">
