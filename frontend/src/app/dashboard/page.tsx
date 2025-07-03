@@ -17,6 +17,9 @@ import EndpointChart from "@/components/charts/EndpointChart"
 import TrafficChart from "@/components/charts/TrafficChart"
 import InfoChart from "@/components/charts/InfoChart"
 import UptimeChart from "@/components/charts/UptimeChart"
+
+import {useSocketDashboard } from "@/hooks/useSocketDashboard"
+
 interface ApiData {
   id: string
   name: string
@@ -85,7 +88,7 @@ export default function Dashboard() {
   const [uptimes, setUptimes] = useState<UptimeData | null>(null);
  const [dashboardData, setdashboardData] = useState<DashData | null>(null); 
 
-  // Fetch APIs for the logged-in user
+
 
 
     // fetch uptime of a perticular api
@@ -301,12 +304,10 @@ useEffect(() => {
           <div className="grid gap-6">
          
             {/* Key Infos Row */}
+
 {uptimes && (
   <InfoChart
-    StatusData={uptimes.status.status}
-    HoursData={uptimes.hours}
-    LatencyData={uptimes.latency.latency}
-    TrafficData={dashboardData?.total_requests || ''}
+    selectedAPI={selectedAPI || ''}
   />
 )}
 
@@ -320,7 +321,7 @@ useEffect(() => {
 
 
 
-<div className="grid gap-6 lg:grid-cols-2 w-full ml-4">
+<div className="grid gap-6 lg:grid-cols-2 w-screen ml-4">
   
   <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
     <CardHeader className="pb-2">

@@ -22,7 +22,8 @@
     "nodemailer": "^7.0.4",
     "perf_hooks": "^0.0.1",
     "pg": "^8.16.0",
-    "postgres": "^3.4.7"
+    "postgres": "^3.4.7",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
