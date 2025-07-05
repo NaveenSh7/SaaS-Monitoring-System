@@ -24,14 +24,17 @@ export const useSocketDashboard = (selectedAPI: string ) => {
     LatencyData: 0,
     TrafficData: 0,
   });
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
+     setLoading(true);
+
     socket = io('http://localhost:5000'); // backend WebSocket server
     
     socket.emit('GetDashboardData', { selectedAPI });
 
     socket.on('DashboardData', (incomingData) => {
         // console.log(incomingData)
+           setLoading(false); // ✅ data received
       setData(incomingData);
     });
 
@@ -41,5 +44,5 @@ export const useSocketDashboard = (selectedAPI: string ) => {
     };
   }, [selectedAPI]);
 
-  return data;
+  return {data , loading};
 };

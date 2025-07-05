@@ -6,7 +6,7 @@ import { useState } from "react";
 import { uptime } from "process";
 
 import {useSocketDashboard } from "@/hooks/useSocketDashboard"
-
+import DashboardSkeleton from '@/components/ui/DashboardSkeleton';
 //trefg
 interface InfoProps {
   StatusData: string;
@@ -21,18 +21,27 @@ type HoursData1 = {
 }
 
 
+interface InfoChartProps {
+  selectedAPI: string;
+}
 
-export default function InfoChart  ( selectedAPI : string ){
 
-const data = useSocketDashboard(selectedAPI );
+export default function InfoChart  ( { selectedAPI }: InfoChartProps ){
+console.log(selectedAPI)
+const { data, loading } = useSocketDashboard(selectedAPI);
 console.log(data)
 
+if (loading) {
+  return(<> 
+   < DashboardSkeleton/>
+  </>)
+}
 
   
  if (data.HoursData.length < 2) {
   data.HoursData = [
-    { status: "up", total_hours: 'loading' },
-    { status: "down", total_hours: 'loading' }
+    { status: "up", total_hours: 'Loading' },
+    { status: "down", total_hours: 'Loading' }
   ];
 }
   

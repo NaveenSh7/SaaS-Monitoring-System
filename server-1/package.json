@@ -23,6 +23,7 @@
     "perf_hooks": "^0.0.1",
     "pg": "^8.16.0",
     "postgres": "^3.4.7",
+    "razorpay": "^2.9.6",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {

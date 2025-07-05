@@ -1,4 +1,5 @@
 const db = require('../db');
+const moment = require('moment-timezone');
 
 const getAllApis = async () => {
   const result = await db.query('SELECT * FROM apis');
@@ -31,9 +32,10 @@ const createApi = async (apiData) => {
     const newApi = result.rows[0]
 
     // 2. Immediately insert into uptimes table
+        // const started_at =  moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
     await db.query(
-      `INSERT INTO uptimes (api_id)
-       VALUES ($1)`,
+      `INSERT INTO uptimes (api_id )
+       VALUES ($1 )`,
       [newApi.id]
     )
 

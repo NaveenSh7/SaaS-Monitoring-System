@@ -31,7 +31,7 @@ return(
           <p className="text-zinc-400 max-w-2xl mx-auto">Choose the plan that's right for your business</p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-16 md:grid-cols-2 w-2/3 m-auto ">
           <Card className="bg-zinc-900 border-zinc-800">
             <CardContent className="p-6">
               <h3 className="text-xl font-bold mb-2">Free</h3>
@@ -97,42 +97,6 @@ return(
             </CardContent>
           </Card>
 
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-bold mb-2">Team</h3>
-              <div className="text-3xl font-bold mb-4">
-                $99<span className="text-lg text-zinc-400">/month</span>
-              </div>
-              <p className="text-zinc-400 mb-6">For larger teams and critical applications</p>
-              <ul className="space-y-3 mb-6">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <span>Unlimited monitors</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <span>30-second check intervals</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <span>All alert integrations</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <span>1-year data retention</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <span>Priority support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                  <span>Custom integrations</span>
-                </li>
-              </ul>
-              <Button className="w-full bg-zinc-800 hover:bg-zinc-700">Contact Sales</Button>
-            </CardContent>
-          </Card>
         </div>
       </section>
 </>
