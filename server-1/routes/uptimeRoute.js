@@ -132,6 +132,8 @@ router.get('/' , async (req,res)=>{
       ORDER BY COALESCE(ended_at, NOW()) DESC
     `, [api_id]);
 
+
+
     res.json({hours:hours.rows,status:status.rows[0],timestamps:timestamps.rows,latency:latency.rows[0]});
 
   } catch (error) {

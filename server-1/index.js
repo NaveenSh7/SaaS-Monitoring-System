@@ -41,12 +41,13 @@ io.on('connection', (socket) => {
 
   let intervalId = null;
 
-  socket.on('GetDashboardData', async ({ selectedAPI }) => {
-    console.log(`📡 GetDashboardData for API: ${selectedAPI.selectedAPI}`);
-const api_id = Number(selectedAPI.selectedAPI);
-    intervalId = setInterval(async () => {
-      try {
-        const hours = await db.query(
+  socket.on('GetDashboardData', async ({ selectedAPI  }) => {
+    console.log(`📡 GetDashboardData for API: ${selectedAPI}`);
+    api_id = Number(selectedAPI );
+
+    const sendDashboardData = async () => {
+try {
+        const hoursRes = await db.query(
           `SELECT status, ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(ended_at, NOW()) - started_at)) / 3600), 2) AS total_hours 
            FROM uptimes 
            WHERE api_id = $1 
@@ -79,9 +80,26 @@ const api_id = Number(selectedAPI.selectedAPI);
           [api_id]
         );
 
+            // Create a map from query result
+const statusMap = {
+  up: 0,
+  down: 0
+};
+
+hoursRes.rows.forEach(row => {
+  const status = row.status.toLowerCase();
+  statusMap[status] = row.total_hours;
+});
+
+// Build guaranteed result array
+const hours = [
+  { status: "up", total_hours: statusMap.up },
+  { status: "down", total_hours: statusMap.down }
+];
+
         const DashboardData = {
           StatusData: status.rows[0]?.status || 'unknown',
-          HoursData: hours.rows, // [{ status: 'up', total_hours: 3.5 }, ...]
+          HoursData: hours, // [{ status: 'up', total_hours: 3.5 }, ...]
           LatencyData: parseFloat(latency.rows[0]?.latency || 0),
           TrafficData: parseInt(totalReq.rows[0]?.total || 0),
         };
@@ -90,13 +108,24 @@ const api_id = Number(selectedAPI.selectedAPI);
       } catch (err) {
         console.error('❌ Error fetching dashboard data:', err.message);
       }
-    }, 5000);
+    }
+ 
+    // 🛑 Clear any previous interval immediately
+  
+    sendDashboardData()
+
+    // call func every 5s
+    intervalId = setInterval(async () => {
+      sendDashboardData();
+    }, 3000);
+    
+
   });
 
-  socket.on('disconnectFromApi', ({ api_id }) => {
+  socket.on('disconnectFromApi', ({ selectedAPI }) => {
     clearInterval(intervalId);
-    socket.leave(api_id);
-    console.log(`❎ Unsubscribed from API: ${api_id}`);
+    socket.leave(selectedAPI);
+    console.log(`❎ Unsubscribed from API: ${selectedAPI}`);
   });
 
   socket.on('disconnect', () => {

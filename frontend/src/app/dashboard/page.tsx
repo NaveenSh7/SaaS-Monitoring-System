@@ -307,7 +307,7 @@ useEffect(() => {
 
 {uptimes && (
   <InfoChart
-    selectedAPI={selectedAPI || ''}
+    selectedAPI={selectedAPI || ""}
   />
 )}
 
