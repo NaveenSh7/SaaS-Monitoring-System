@@ -22,6 +22,8 @@ import {
   Zap,
 } from "lucide-react"
 
+
+
 // Add Razorpay type declaration to window
 declare global {
   interface Window {
@@ -31,6 +33,7 @@ declare global {
 
 export default function Payment  (){
  const [amount, setAmount] = useState(499);
+const { data: session } = useSession()
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -60,8 +63,22 @@ export default function Payment  (){
       name: "Saas-Monierting System",
       description: "Test Transaction",
       order_id: orderData.data.id,
-      handler: function (response: { razorpay_payment_id: string; }) {
+      handler: async function  (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string; }) {
+  
         alert("Payment Successful! ID: " + response.razorpay_payment_id);
+
+            // Call backend to store payment in DB
+    try {
+     const resp = await axios.post("http://localhost:5000/api/payment/verify", {
+        payment_id: response.razorpay_payment_id,
+        order_id: response.razorpay_order_id,
+        signature: response.razorpay_signature,
+        amount: orderData.data.amount,
+        user_email: session?.user?.email, 
+      });
+    } catch (error) {
+      console.error("Error storing payment:", error);
+    }
       },
       prefill: {
         name: "Test User",
@@ -76,6 +93,15 @@ export default function Payment  (){
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
+  
+   if (!session?.user?.email) 
+  {
+    return(
+    <>
+    <div> Login Karle shane</div>
+    </>)
+
+  }
     return(
     <>
     <div className="flex justify-center items-center bg-black h-screen w-screen">

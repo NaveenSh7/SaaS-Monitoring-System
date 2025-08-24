@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession} from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link"
 import Image from "next/image"

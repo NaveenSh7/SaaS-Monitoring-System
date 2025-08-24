@@ -23,8 +23,33 @@ import Footer from "@/components/Footer";
 import Pricing from "@/components/Pricing";
 import Facebook from "next-auth/providers/facebook";
 import Features from "@/components/Features";
+import { useState , useEffect} from "react";
+import Loader from "@/components/Loader";
+import { useSession } from "next-auth/react"
+
 
 export default function Home() {
+
+const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Example: Set loading to true while session is loading
+    if (status === "loading") {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [status]);
+
+  if (loading) {
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white px-4">
      <Navbar/>
@@ -76,14 +101,14 @@ export default function Home() {
     <Features/>
 
       {/* Integration Section */}
-      <section className="container py-20 border-t border-zinc-800">
+      <section className="container py-20 border-t border-zinc-800 ">
         <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
           <div>
             <h2 className="text-3xl font-bold mb-4">Simple Integration</h2>
             <p className="text-zinc-400 mb-6">
               Add our SDK to your application in minutes. Start monitoring with just a few lines of code.
             </p>
-            <div className="space-y-4">
+            <div className="space-y-4 text-white">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                 <span>Works with any framework or language</span>

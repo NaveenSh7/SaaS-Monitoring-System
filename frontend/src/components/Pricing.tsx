@@ -33,7 +33,7 @@ return(
 
         <div className="grid gap-16 md:grid-cols-2 w-2/3 m-auto ">
           <Card className="bg-zinc-900 border-zinc-800">
-            <CardContent className="p-6">
+            <CardContent className="p-6 text-white">
               <h3 className="text-xl font-bold mb-2">Free</h3>
               <div className="text-3xl font-bold mb-4">
                 $0<span className="text-lg text-zinc-400">/month</span>
@@ -65,7 +65,7 @@ return(
             <div className="absolute top-0 right-0 bg-emerald-600 text-xs font-bold px-3 py-1 rounded-bl-lg">
               POPULAR
             </div>
-            <CardContent className="p-6">
+            <CardContent className="p-6 text-white">
               <h3 className="text-xl font-bold mb-2">Developer</h3>
               <div className="text-3xl font-bold mb-4">
                 $29<span className="text-lg text-zinc-400">/month</span>
@@ -93,7 +93,11 @@ return(
                   <span>API access</span>
                 </li>
               </ul>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700">Start Free Trial</Button>
+               <Link href="/payment" passHref>
+      <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+        Purchase Now
+      </Button>
+    </Link>
             </CardContent>
           </Card>
 

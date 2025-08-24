@@ -55,7 +55,7 @@ interface TimestampData {
 }
 type UptimeData = {
   status: StatusData;
-  hours: HoursData[]; // ✅ fixed this line
+  hours: HoursData[];
   timestamps: UptimeStampData[];
   latency: LatencyData;
 };
