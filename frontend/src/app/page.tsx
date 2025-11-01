@@ -1,27 +1,16 @@
 "use client";
 
-import Link from "next/link"
 import Image from "next/image"
 import {
-  Activity,
-  AlertCircle,
   ArrowRight,
   CheckCircle2,
-  Code,
-  Database,
-  LineChart,
-  Loader2,
-  Shield,
-  Zap,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Pricing from "@/components/Pricing";
-import Facebook from "next-auth/providers/facebook";
 import Features from "@/components/Features";
 import { useState , useEffect} from "react";
 import Loader from "@/components/Loader";
@@ -69,14 +58,17 @@ const { data: session, status } = useSession();
               dashboard.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer">
                 Start Monitoring
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white"
+                className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white cursor-pointer"
+                  onClick={() => {
+                       document.getElementById('documention')?.scrollIntoView({ behavior: 'smooth' });
+                 }} 
               >
                 View Documentation
               </Button>
@@ -86,9 +78,9 @@ const { data: session, status } = useSession();
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-blue-500/10 rounded-lg blur-3xl" />
             <div className="relative rounded-lg border border-zinc-800 bg-zinc-950 overflow-hidden shadow-2xl">
               <Image
-                src="/placeholder.svg?height=600&width=800"
-                width={800}
-                height={600}
+                src="/hero.png"
+                width={1000}
+                height={1000}
                 alt="Dashboard Preview"
                 className="w-full h-auto"
               />
@@ -99,65 +91,72 @@ const { data: session, status } = useSession();
 
       {/* Features Section */}
     <Features/>
+{/* Integration Section */}
+<section className="container py-20 border-t border-zinc-800" id="documention" >
+  <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
+    {/* Left Side (Same) */}
+    <div>
+      <h2 className="text-3xl font-bold mb-4">Simple Integration</h2>
+      <p className="text-zinc-400 mb-6">
+        Add our SDK to your application in minutes. Start monitoring with just a few lines of code.
+      </p>
+      <div className="space-y-4 text-white">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+          <span>Works with React.Js and Next.Js</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+          <span>Zero performance impact</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+          <span>Automatic error tracking</span>
+        </div>
+      </div>
+    </div>
 
-      {/* Integration Section */}
-      <section className="container py-20 border-t border-zinc-800 ">
-        <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
-          <div>
-            <h2 className="text-3xl font-bold mb-4">Simple Integration</h2>
-            <p className="text-zinc-400 mb-6">
-              Add our SDK to your application in minutes. Start monitoring with just a few lines of code.
-            </p>
-            <div className="space-y-4 text-white">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                <span>Works with any framework or language</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                <span>Zero performance impact</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                <span>Automatic error tracking</span>
-              </div>
-            </div>
-          </div>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 overflow-hidden">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="h-3 w-3 rounded-full bg-red-500" />
-              <div className="h-3 w-3 rounded-full bg-yellow-500" />
-              <div className="h-3 w-3 rounded-full bg-green-500" />
-              <span className="text-sm text-zinc-400 ml-2">app.js</span>
-            </div>
-            <pre className="text-sm overflow-x-auto">
-              <code className="language-javascript text-zinc-100">
-                {`import { monitor } from '@apimonitor/sdk';
+    {/* Right Side (3-Step Boxes) */}
+    <div className="space-y-6">
+      {/* Step 1 */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 1: Install the SDK</h3>
+        <pre className="text-sm bg-zinc-950 p-3 rounded-md overflow-x-auto">
+          <code className="language-bash text-zinc-100">
+{`npm i saas-monitering-sdk`}
+          </code>
+        </pre>
+      </div>
 
-// Initialize the monitor
-monitor.init({
-  apiKey: 'your-api-key',
-  service: 'payment-service',
+      {/* Step 2 */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 2: Get your API key</h3>
+        <p className="text-zinc-400 text-sm">
+          Retrieve the <span className="text-white font-medium">api_key</span> for your corresponding service from your SaaS Monitoring Dashboard.
+        </p>
+      </div>
+
+      {/* Step 3 */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 overflow-hidden">
+        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 3: Add this code to your entry server's point</h3>
+        <pre className="text-sm bg-zinc-950 p-3 rounded-md overflow-x-auto">
+          <code className="language-javascript text-zinc-100">
+{`// SaaS Monitoring for Node
+app.set('trust proxy', true);
+const Logger = require('saas-monitering-sdk');
+
+Logger.init({
+  api_key: 'your_api_key',
 });
 
-// Monitor API endpoints
-app.get('/api/users', async (req, res) => {
-  const span = monitor.startSpan('fetch-users');
-  
-  try {
-    const users = await db.getUsers();
-    res.json(users);
-    span.end();
-  } catch (error) {
-    span.recordError(error);
-    res.status(500).send('Error fetching users');
-  }
-});`}
-              </code>
-            </pre>
-          </div>
-        </div>
-      </section>
+app.use(Logger.middleware());`}
+          </code>
+        </pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Dashboard Preview */}
       <section className="container py-20 border-t border-zinc-800">
@@ -170,18 +169,12 @@ app.get('/api/users', async (req, res) => {
 
         <div className="relative rounded-lg border border-zinc-800 bg-zinc-950 overflow-hidden shadow-2xl">
           <Image
-            src="/placeholder.svg?height=800&width=1600"
+            src="/overview.png"
             width={1600}
             height={800}
             alt="Dashboard Preview"
             className="w-full h-auto"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50" />
-          <div className="absolute bottom-0 left-0 right-0 p-6 text-center">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
-              See It In Action
-            </Button>
-          </div>
         </div>
       </section>
 

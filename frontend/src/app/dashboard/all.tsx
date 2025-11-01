@@ -75,10 +75,6 @@ const { data: session } = useSession();
               <h1 className="text-2xl md:text-3xl font-bold">Hello, {session?.user?.name} 👋</h1>
               <p className="text-zinc-400 text-sm md:text-base">Welcome back to your monitoring dashboard</p>
             </div>
-            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 w-fit">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
           </div>
         </div>
       </header>
@@ -133,11 +129,11 @@ const { data: session } = useSession();
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                   <Settings className="h-4 w-4 mr-2" />
-                  Configure
+                  Copy api_key
                 </Button>
                 <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
                   <AlertCircle className="h-4 w-4 mr-2" />
-                  Alerts
+                  Delete
                 </Button>
               </div>
             </div>

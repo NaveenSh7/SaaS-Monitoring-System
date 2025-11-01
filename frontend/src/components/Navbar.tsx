@@ -1,25 +1,13 @@
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { signIn, signOut, useSession} from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link"
-import Image from "next/image"
 import Loader from "@/components/Loader"
  
 
 import {
   Activity,
-  AlertCircle,
-  ArrowRight,
-  CheckCircle2,
-  Code,
-  Database,
-  LineChart,
-  Loader2,
-  Router,
-  Shield,
-  Zap,
 } from "lucide-react"
 
 export default function Navbar (){
@@ -43,18 +31,16 @@ return(
             <Link href="/" className="text-xl font-bold">Saas-Monitor</Link>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
               Features
             </Link>
-            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
               Pricing
             </Link>
-            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
               Documentation
             </Link>
-            <Link href="#" className="text-sm font-medium text-zinc-400 hover:text-white">
-              Blog
-            </Link>
+
           </nav>
            
 
@@ -72,7 +58,7 @@ return(
         await signOut();
         setLoading(false);
       }}
-      className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white "
+      className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white cursor-pointer "
     >
       Logout
     </Button>
@@ -83,7 +69,7 @@ return(
                 await  signIn("google") 
                 setLoading(false);
               } }
-                className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white">
+                className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white cursor-pointer">
               Login
             </Button>
             <Button 
@@ -92,7 +78,7 @@ return(
                 await  signIn("google") 
                 setLoading(false);
               } }
-            className="bg-emerald-600 hover:bg-emerald-700">Sign Up Free</Button>
+            className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer">Sign Up Free</Button>
           </div>) }
         
         </div>

@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Activity, AlertCircle, CheckCircle2, Clock, Edit, LineChart, Server, Settings, TrendingUp } from "lucide-react"
+import { Activity, AlertCircle,   LineChart, Server, Settings } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,7 +15,6 @@ import Loader from "@/components/Loader"
 import EndpointChart from "@/components/charts/EndpointChart"
 import TrafficChart from "@/components/charts/TrafficChart"
 import InfoChart from "@/components/charts/InfoChart"
-import UptimeChart from "@/components/charts/UptimeChart"
 
 import {useSocketDashboard } from "@/hooks/useSocketDashboard"
 
@@ -26,7 +24,8 @@ interface ApiData {
   url: string
   api_type: string
   plan: string
-  status?: string // We'll assign this randomly for demo
+  status?: string 
+  api_key : string
 }
 
 
@@ -191,7 +190,19 @@ useEffect(() => {
         return <Badge className="bg-gray-900/30 text-gray-400 border-gray-600">Unknown</Badge>
     }
   }
+ 
+  const deteleApi =(selectedAPIData : any)=>{
+    let confirmDelete = confirm(
+        `Are you sure you want to delete "${selectedAPIData.name}"?`
+      );
+        if (!confirmDelete) return;
+      if (!confirmDelete) return;
+       confirmDelete = confirm(
+        `You will loose all the monitering data are you sure?`
+      );
+        if (!confirmDelete) return;
 
+  }
 
   if(loading)
     {
@@ -213,10 +224,7 @@ useEffect(() => {
               <h1 className="text-2xl md:text-3xl font-bold">Hello, {session?.user?.name || "User"} 👋</h1>
               <p className="text-zinc-400 text-sm md:text-base">Welcome back to your monitoring dashboard</p>
             </div>
-            <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 w-fit">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
+
           </div>
         </div>
       </header>
@@ -286,13 +294,30 @@ useEffect(() => {
                 {getStatusBadge("healthy")}
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                  <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-zinc-700 text-zinc-800 cursor-pointer hover:bg-emerald-400"
+                  onClick={() => {
+                    if (selectedAPIData?.api_key) {
+                      navigator.clipboard.writeText(selectedAPIData.api_key);
+                      alert("API key copied to clipboard!"); // or use a toast instead of alert
+                    } else {
+                      alert("No API key found!");
+                    }
+                  }}
+                >              
                   <Settings className="h-4 w-4 mr-2" />
-                  Configure
+                  Copy api_key
                 </Button>
-                <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
+                <Button 
+                size="sm" 
+                variant="outline" 
+                className="border-zinc-700 text-zinc-800 cursor-pointer hover:bg-red-400"
+                onClick={ ()=>deteleApi(selectedAPIData)}
+                >
                   <AlertCircle className="h-4 w-4 mr-2" />
-                  Alerts
+                  Delete Service
                 </Button>
               </div>
             </div>
