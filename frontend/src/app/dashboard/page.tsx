@@ -112,7 +112,7 @@ useEffect(() => {
         setApis(data);
 
         // ✅ Set selected API separately and let another useEffect handle fetchUptimes
-        if (data.length > 0) {
+        if (data.length > 0 && !selectedAPI) {
           setSelectedAPI(data[0].id);
         }
       } else {
