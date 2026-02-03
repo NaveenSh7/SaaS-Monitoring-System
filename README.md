@@ -7,17 +7,6 @@ The system uses a **modular, service-based architecture** with a lightweight SDK
 This project follows an **open-core SaaS model**: the core monitoring infrastructure is open-source and extensible.
 
 ---
-<img width="1746" height="738" alt="image" src="https://github.com/user-attachments/assets/8efff9d7-d9ce-46cb-992e-deab438d8f4c" />
-
-<img width="1778" height="812" alt="Screenshot 2025-11-02 020609" src="https://github.com/user-attachments/assets/dab94c5c-4d5b-4c58-8f24-9b4815909ec0" />
-
-
-<img width="1893" height="675" alt="Screenshot 2025-07-26 102933" src="https://github.com/user-attachments/assets/cd591d3c-7fff-415c-a828-44b35cfb2345" />
-
-
-<img width="1920" height="609" alt="Screenshot 2025-07-26 102921" src="https://github.com/user-attachments/assets/a1b13479-561c-4acb-a288-86e507f99c4d" />
-
-
 ##  Project Architecture
 
 frontend/ → Next.js dashboard (UI)
