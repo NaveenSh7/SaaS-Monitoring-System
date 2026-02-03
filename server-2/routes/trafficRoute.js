@@ -14,13 +14,13 @@ function toISTISOString(utcString) {
 // Add log-data
 router.post('/logs', async (req, res) => {
   console.log("agaya mei");
-  const client = await pool.connect(); // ✅ use a dedicated client
+  const client = await pool.connect(); //  use a dedicated client
 
   try {
     const rawLogs = req.body;
     const api_key = req.headers['x-api-secret'];
 
-    // 🔁 Use client.query, not pool.query
+    //  Use client.query, not pool.query
     const { rows } = await client.query(
       'SELECT id FROM apis WHERE api_key = $1',
       [api_key]
@@ -68,7 +68,7 @@ router.post('/logs', async (req, res) => {
     console.error("Error saving logs:", err);
     res.status(500).json({ message: 'Error during logs receive and store' });
   } finally {
-    client.release(); // ✅ always release client
+    client.release(); //  always release client
   }
 });
 

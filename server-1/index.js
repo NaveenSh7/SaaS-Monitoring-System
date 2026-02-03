@@ -4,8 +4,6 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const app = express();
 const axios = require('axios');
-const { getAllApis, createApi, getApi, updateApi } = require('./models/apiModel');
-const {createUptime ,updateUptime,getUptime } = require('./models/uptimeModel');
 const db = require('./db');
 require('dotenv').config();
 

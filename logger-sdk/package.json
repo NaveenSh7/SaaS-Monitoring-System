@@ -1,0 +1,18 @@
+{
+  "name": "saas-monitering-sdk",
+  "version": "1.0.3",
+  "description": "Lightweight SDK for sending optimum API log data to our Saas-Monitering server",
+  "main": "index.js",
+  "type": "commonjs",
+  "keywords": [
+    "logging",
+    "sdk",
+    "metrics",
+    "analytics",
+    "Saas",
+    "Monitering"
+
+  ],
+  "author": "Naveen , Jayesh",
+  "license": "MIT"
+}
