@@ -17,7 +17,6 @@ This project follows an **open-core SaaS model**: the core monitoring infrastruc
 
 <img width="1920" height="609" alt="Screenshot 2025-07-26 102921" src="https://github.com/user-attachments/assets/a1b13479-561c-4acb-a288-86e507f99c4d" />
 
-<img width="1903" height="875" alt="Screenshot 2025-11-02 013820" src="https://github.com/user-attachments/assets/a83ab07d-d3d4-4c75-9106-fdef702f0547" />
 
 ##  Project Architecture
 
