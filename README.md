@@ -9,13 +9,13 @@ This project follows an **open-core SaaS model**: the core monitoring infrastruc
 ---
 ##  Project Architecture
 
-frontend/ → Next.js dashboard (UI)
-server-1/ → Core backend (Realtime + APIs)
-server-2/ → Traffic ingestion service
-logger-sdk/ → Lightweight monitoring SDK
+- frontend/ → Next.js dashboard (UI)
+- server-1/ → Core backend (Realtime + APIs)
+- server-2/ → Traffic ingestion service
+- logger-sdk/ → Lightweight monitoring SDK
 
 
-Each component has a **single responsibility**, making the platform scalable and maintainable.
+Please feel free to contact me if u need any assistance.
 
 ---
 
