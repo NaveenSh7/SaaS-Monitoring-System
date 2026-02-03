@@ -23,39 +23,15 @@ export default function AddAPI() {
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(false)
   // Pre-written SDK integration code
-  const sdkIntegrationCode = `// SaaS Monitor SDK Integration
-const { SaasMonitor } = require('@saas-monitor/sdk');
+  const sdkIntegrationCode = `// SaaS Monitoring for Node
+app.set('trust proxy', true);
+const Logger = require('saas-monitering-sdk');
 
-// Initialize the monitor
-const monitor = new SaasMonitor({
-  apiKey: 'your-api-key-here',
-  endpoint: '${apiUrl || "https://your-api-endpoint.com"}',
-  options: {
-    timeout: 5000,
-    retries: 3,
-    interval: 30000 // Check every 30 seconds
-  }
+Logger.init({
+  api_key: 'your_api_key',
 });
 
-// Track API calls
-monitor.track('${apiName || "api-call"}', {
-  method: 'GET',
-  path: '/health',
-  expectedStatus: 200
-});
-
-// Monitor specific endpoints
-monitor.addEndpoint({
-  name: '${apiName || "API"} Health Check',
-  url: '${apiUrl || "https://your-api-endpoint.com"}/health',
-  method: 'GET',
-  timeout: 5000
-});
-
-// Start monitoring
-monitor.start();
-
-console.log('${apiName || "API"} monitoring started successfully!');`
+app.use(Logger.middleware());`
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
