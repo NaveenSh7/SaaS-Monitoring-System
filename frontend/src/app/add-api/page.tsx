@@ -40,7 +40,7 @@ app.use(Logger.middleware());`
       setApiNameError("API name is required")
       return false
     }
-    if (value.includes(" ")) {
+    if (/\s/.test(value)) {
       setApiNameError("API name cannot contain spaces")
       return false
     }
