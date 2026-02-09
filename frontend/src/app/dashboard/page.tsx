@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Activity, AlertCircle,   LineChart, Server, Settings } from "lucide-react"
+import { Activity, AlertCircle, LineChart, Server, Settings } from "lucide-react"
 
 import ExportButtons from "@/components/ExportButtons";
 import { Button } from "@/components/ui/button"
@@ -17,7 +17,7 @@ import EndpointChart from "@/components/charts/EndpointChart"
 import TrafficChart from "@/components/charts/TrafficChart"
 import InfoChart from "@/components/charts/InfoChart"
 
-import {useSocketDashboard } from "@/hooks/useSocketDashboard"
+import { useSocketDashboard } from "@/hooks/useSocketDashboard"
 
 interface ApiData {
   id: string
@@ -25,33 +25,33 @@ interface ApiData {
   url: string
   api_type: string
   plan: string
-  status?: string 
-  api_key : string
+  status?: string
+  api_key: string
 }
 
 
-type DashData ={
-  total_requests : number;
-  countries : CountriesData[];
- cities : CitiesData[];
- endpoints : EndpointsData[];
- timestamps : TimestampData[];
+type DashData = {
+  total_requests: number;
+  countries: CountriesData[];
+  cities: CitiesData[];
+  endpoints: EndpointsData[];
+  timestamps: TimestampData[];
 }
 
-type CountriesData ={
-   country: string,
-    count:  number;
+type CountriesData = {
+  country: string,
+  count: number;
 }
-type CitiesData ={
-   city: string,
-    count:  number;
+type CitiesData = {
+  city: string,
+  count: number;
 }
-type EndpointsData ={
-   endpoint: string,
-    count:  number | string;
+type EndpointsData = {
+  endpoint: string,
+  count: number | string;
 }
 interface TimestampData {
-  timestamp: string; 
+  timestamp: string;
 }
 type UptimeData = {
   status: StatusData;
@@ -86,83 +86,95 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null)
   const [uptimes, setUptimes] = useState<UptimeData | null>(null);
- const [dashboardData, setdashboardData] = useState<DashData | null>(null); 
+  const [dashboardData, setdashboardData] = useState<DashData | null>(null);
 
 
 
 
-    // fetch uptime of a perticular api
+  // fetch uptime of a perticular api
 
-    const selectedAPIData = apis.find((api) => api.id === selectedAPI);
+  const selectedAPIData = apis.find((api) => api.id === selectedAPI);
+  const exportData = dashboardData
+    ? {
+      traffic: dashboardData.timestamps.map((t, i) => ({
+        timestamp: t.timestamp,   // 👈 FIX
+      })),
+      endpoints: dashboardData.endpoints || [],
+      countries: dashboardData.countries || [],
+      cities: dashboardData.cities || [],
+    }
+    : null;
 
-useEffect(() => {
-  const fetchApis = async () => {
-    if (!session?.user?.email) return;
 
-    try {
-      const userEmail = session.user.email;
-      const userRes = await fetch(`http://localhost:5000/api/users?email=${userEmail}`);
-      if (!userRes.ok) throw new Error("Failed to fetch user");
 
-      const userData = await userRes.json();
-      const userId = userData.id;
+  useEffect(() => {
+    const fetchApis = async () => {
+      if (!session?.user?.email) return;
 
-      const response = await fetch(`http://localhost:5000/api/apis?user_id=${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setApis(data);
+      try {
+        const userEmail = session.user.email;
+        const userRes = await fetch(`http://localhost:5000/api/users?email=${userEmail}`);
+        if (!userRes.ok) throw new Error("Failed to fetch user");
 
-        // ✅ Set selected API separately and let another useEffect handle fetchUptimes
-        if (data.length > 0 && !selectedAPI) {
-          setSelectedAPI(data[0].id);
+        const userData = await userRes.json();
+        const userId = userData.id;
+
+        const response = await fetch(`http://localhost:5000/api/apis?user_id=${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setApis(data);
+
+          // ✅ Set selected API separately and let another useEffect handle fetchUptimes
+          if (data.length > 0 && !selectedAPI) {
+            setSelectedAPI(data[0].id);
+          }
+        } else {
+          console.error("Failed to fetch APIs");
         }
-      } else {
-        console.error("Failed to fetch APIs");
+      } catch (error) {
+        console.error("Error fetching APIs:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching APIs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchApis();
-}, [session]);
+    fetchApis();
+  }, [session]);
 
-useEffect(() => {
-  const fetchUptimes = async () => {
-    if (!selectedAPI) return;
+  useEffect(() => {
+    const fetchUptimes = async () => {
+      if (!selectedAPI) return;
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/uptime?api_id=${selectedAPI}`);
-      const data = await response.json();
-      setUptimes(data);
-// console.log(data)
-      
-    } catch (error) {
-      console.error("Error fetching uptimes:", error);
-    }
-  };
+      try {
+        const response = await fetch(`http://localhost:5000/api/uptime?api_id=${selectedAPI}`);
+        const data = await response.json();
+        setUptimes(data);
+        // console.log(data)
 
-  fetchUptimes();
-}, [selectedAPI]);
+      } catch (error) {
+        console.error("Error fetching uptimes:", error);
+      }
+    };
 
-useEffect(() => {
-  const fetchDashboard = async () => {
-    if (!selectedAPI) return;
+    fetchUptimes();
+  }, [selectedAPI]);
 
-    try {
-      const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
-      const data = await response.json();
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      if (!selectedAPI) return;
 
-      setdashboardData(data);
-    } catch (error) {
-      console.error("Error fetching uptimes:", error);
-    }
-  };
+      try {
+        const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
+        const data = await response.json();
 
-  fetchDashboard();
-}, [selectedAPI]);
+        setdashboardData(data);
+      } catch (error) {
+        console.error("Error fetching uptimes:", error);
+      }
+    };
+
+    fetchDashboard();
+  }, [selectedAPI]);
 
 
 
@@ -191,29 +203,28 @@ useEffect(() => {
         return <Badge className="bg-gray-900/30 text-gray-400 border-gray-600">Unknown</Badge>
     }
   }
- 
-  const deteleApi =(selectedAPIData : any)=>{
+
+  const deteleApi = (selectedAPIData: any) => {
     let confirmDelete = confirm(
-        `Are you sure you want to delete "${selectedAPIData.name}"?`
-      );
-        if (!confirmDelete) return;
-      if (!confirmDelete) return;
-       confirmDelete = confirm(
-        `You will loose all the monitering data are you sure?`
-      );
-        if (!confirmDelete) return;
+      `Are you sure you want to delete "${selectedAPIData.name}"?`
+    );
+    if (!confirmDelete) return;
+    if (!confirmDelete) return;
+    confirmDelete = confirm(
+      `You will loose all the monitering data are you sure?`
+    );
+    if (!confirmDelete) return;
 
   }
 
-  if(loading)
-    {
-      return(
-       <div >
-        <Loader/>
-        </div> )
-    }
+  if (loading) {
+    return (
+      <div >
+        <Loader />
+      </div>)
+  }
 
-// console.log(uptimes)
+  // console.log(uptimes)
   return (
     <div className="min-h-screen bg-black text-white px-4">
       <Navbar />
@@ -225,10 +236,6 @@ useEffect(() => {
               <h1 className="text-2xl md:text-3xl font-bold">Hello, {session?.user?.name || "User"} 👋</h1>
               <p className="text-zinc-400 text-sm md:text-base">Welcome back to your monitoring dashboard</p>
             </div>
-          
-          <div className="flex items-center gap-2">
-               <ExportButtons data={apis} filename={`${session?.user?.name || "user"}-monitoring-report`} />
-            </div>
           </div>
         </div>
       </header>
@@ -236,16 +243,32 @@ useEffect(() => {
       <div className="container px-4 py-6 md:py-8">
         {/* API Selection */}
         <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold mb-2">API Monitoring</h2>
-              <p className="text-zinc-400 text-sm md:text-base">Select an API to view detailed monitoring data</p>
-            </div>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 w-fit" onClick={() => router.push("/add-api")}>
-              <Server className="h-4 w-4 mr-2" />
-              Add New API
-            </Button>
-          </div>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+  {/* Left: Title */}
+  <div>
+    <h2 className="text-xl md:text-2xl font-bold mb-2">API Monitoring</h2>
+    <p className="text-zinc-400 text-sm md:text-base">
+      Select an API to view detailed monitoring data
+    </p>
+  </div>
+
+  {/* Right: Actions */}
+  <div className="flex items-center gap-3">
+    <Button
+      className="bg-emerald-600 hover:bg-emerald-700"
+      onClick={() => router.push("/add-api")}
+    >
+      <Server className="h-4 w-4 mr-2" />
+      Add New API
+    </Button>
+
+    <ExportButtons
+      data={exportData}
+      filename={`${selectedAPIData?.name || "api"}-analytics-report`}
+    />
+  </div>
+</div>
+
 
           {loading ? (
             <div className="flex justify-center items-center py-12">
@@ -267,11 +290,10 @@ useEffect(() => {
               {apis.map((api) => (
                 <Card
                   key={api.id}
-                  className={`cursor-pointer transition-all border-2 ${
-                    selectedAPI === api.id
+                  className={`cursor-pointer transition-all border-2 ${selectedAPI === api.id
                       ? "border-emerald-600 bg-emerald-900/10"
                       : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
-                  }`}
+                    }`}
                   onClick={() => setSelectedAPI(api.id)}
                 >
                   <CardContent className="p-4 text-white">
@@ -298,7 +320,7 @@ useEffect(() => {
                 {getStatusBadge("healthy")}
               </div>
               <div className="flex gap-2">
-                  <Button
+                <Button
                   size="sm"
                   variant="outline"
                   className="border-zinc-700 text-zinc-800 cursor-pointer hover:bg-emerald-400"
@@ -310,15 +332,15 @@ useEffect(() => {
                       alert("No API key found!");
                     }
                   }}
-                >              
+                >
                   <Settings className="h-4 w-4 mr-2" />
                   Copy api_key
                 </Button>
-                <Button 
-                size="sm" 
-                variant="outline" 
-                className="border-zinc-700 text-zinc-800 cursor-pointer hover:bg-red-400"
-                onClick={ ()=>deteleApi(selectedAPIData)}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-zinc-700 text-zinc-800 cursor-pointer hover:bg-red-400"
+                  onClick={() => deteleApi(selectedAPIData)}
                 >
                   <AlertCircle className="h-4 w-4 mr-2" />
                   Delete Service
@@ -331,91 +353,91 @@ useEffect(() => {
         {/* Monitoring Dashboard - Only show if an API is selected */}
         {selectedAPIData && (
           <div className="grid gap-6">
-         
+
             {/* Key Infos Row */}
 
-{uptimes && (
-  <InfoChart
-    selectedAPI={selectedAPI || ""}
-  />
-)}
+            {uptimes && (
+              <InfoChart
+                selectedAPI={selectedAPI || ""}
+              />
+            )}
 
 
             {/* Charts Row */}
 
-{/* // EndpointChart & Traffic value chart */}
+            {/* // EndpointChart & Traffic value chart */}
 
 
 
 
 
 
-<div className="grid gap-6 lg:grid-cols-2 w-screen ml-4">
-  
-  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
-    <CardHeader className="pb-2">
-      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-        <LineChart className="h-5 w-5 text-emerald-500" />
-        Traffic
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="h-[350px] p-4 pt-0">
-      
-        <TrafficChart timestamps={dashboardData?.timestamps || []} />
-      
-    </CardContent>
-  </Card>
+            <div className="grid gap-6 lg:grid-cols-2 w-screen ml-4">
+
+              <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+                    <LineChart className="h-5 w-5 text-emerald-500" />
+                    Traffic
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[350px] p-4 pt-0">
+
+                  <TrafficChart timestamps={dashboardData?.timestamps || []} />
+
+                </CardContent>
+              </Card>
 
 
-  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
-    <CardHeader className="pb-2">
-      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-        <LineChart className="h-5 w-5 text-emerald-500" />
-        Endpoints Usage Pie Chart
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="h-[350px] pt-0 m-auto">
-      
-        <EndpointChart data={dashboardData?.endpoints || []} />
-     
-      
-    </CardContent>
-  </Card>
+              <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+                    <LineChart className="h-5 w-5 text-emerald-500" />
+                    Endpoints Usage Pie Chart
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[350px] pt-0 m-auto">
 
-  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
-    <CardHeader className="pb-2">
-      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-        <LineChart className="h-5 w-5 text-emerald-500" />
-        Country Distribution
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="h-[350px] p-4 pt-0">
-      
-        <CountryData countries={dashboardData?.countries || []} />
-      
-    </CardContent>
-  </Card>
-
-  <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
-    <CardHeader className="pb-2">
-      <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-        <LineChart className="h-5 w-5 text-emerald-500" />
-        City Distribution
-      </CardTitle>
-    </CardHeader>
-    <CardContent className="h-[350px] p-4 pt-0">
-      
-        <CityData cities={dashboardData?.cities || []} />
-      
-    </CardContent>
-  </Card>
+                  <EndpointChart data={dashboardData?.endpoints || []} />
 
 
+                </CardContent>
+              </Card>
 
-</div>
-<div className="w-full ml-4">
-  {/* uptimes wala graph */}
-    {/* <Card className="w-full bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+              <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+                    <LineChart className="h-5 w-5 text-emerald-500" />
+                    Country Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[350px] p-4 pt-0">
+
+                  <CountryData countries={dashboardData?.countries || []} />
+
+                </CardContent>
+              </Card>
+
+              <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
+                    <LineChart className="h-5 w-5 text-emerald-500" />
+                    City Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[350px] p-4 pt-0">
+
+                  <CityData cities={dashboardData?.cities || []} />
+
+                </CardContent>
+              </Card>
+
+
+
+            </div>
+            <div className="w-full ml-4">
+              {/* uptimes wala graph */}
+              {/* <Card className="w-full bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
   <CardHeader className="pb-2">
     <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
       <LineChart className="h-5 w-5 text-emerald-500" />
@@ -427,7 +449,7 @@ useEffect(() => {
   </CardContent>
 </Card> */}
 
-</div>
+            </div>
 
             {/* Recent Activity */}
             <Card className="bg-zinc-900 border-zinc-800">
