@@ -14,7 +14,35 @@ interface ExportProps {
   filename?: string;
 }
 
+type DashData = {
+  total_requests: number;
+  countries: CountriesData[];
+  cities: CitiesData[];
+  endpoints: EndpointsData[];
+  timestamps: TimestampData[];
+}
+
+type CountriesData = {
+  country: string;
+  count: number;
+}
+
+type CitiesData = {
+  city: string;
+  count: number;
+}
+
+type EndpointsData = {
+  endpoint: string;
+  count: number | string;
+}
+
+interface TimestampData {
+  timestamp: string;
+}
+
 const ExportButtons = ({ data, filename = "monitoring-report" }: ExportProps) => {
+  
   const exportToCSV = () => {
     if (!data) return alert("No data to export");
 
@@ -89,16 +117,18 @@ const ExportButtons = ({ data, filename = "monitoring-report" }: ExportProps) =>
     <div className="flex gap-2 my-4">
       <button
         onClick={exportToCSV}
-        className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm font-medium"
+        className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        title="Export analytics data as CSV file"
+        disabled={!data}
       >
-        Export CSV
+        📊 Export CSV
       </button>
 
       <button
         onClick={exportToPDF}
         className="px-4 py-2 bg-white text-black rounded-md hover:bg-gray-500 hover:text-white text-sm font-medium"
       >
-        Export PDF
+        📄 Export PDF
       </button>
     </div>
   );
