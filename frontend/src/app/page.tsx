@@ -15,7 +15,7 @@ import Features from "@/components/Features";
 import { useState , useEffect} from "react";
 import Loader from "@/components/Loader";
 import { useSession } from "next-auth/react"
-
+import Link from "next/link";
 
 export default function Home() {
 
@@ -58,10 +58,15 @@ const { data: session, status } = useSession();
               dashboard.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer">
-                Start Monitoring
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href="/dashboard">
+                    <Button
+                    size="lg"
+                    className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
+                       >
+                 Start Monitoring
+            <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            </Link>
               <Button
                 size="lg"
                 variant="outline"
@@ -187,10 +192,12 @@ app.use(Logger.middleware());`}
           <p className="text-zinc-400 max-w-2xl mx-auto mb-8">
             Join thousands of developers who trust APIMonitor to keep their services running smoothly.
           </p>
-          <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
-            Start Your Free Trial
-            <ArrowRight className="ml-2 h-4 w-4" />
+         <Link href="/dashboard">
+           <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+           Start Your Free Trial
+          <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
+          </Link>
         </div>
       </section>
 
