@@ -22,6 +22,8 @@ export default function AddAPI() {
   const [plan, setPlan] = useState<"free" | "pro" | null>(null)
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [apiNameError, setApiNameError] = useState("")
+  const [apiUrlError, setApiUrlError] = useState("")
   // Pre-written SDK integration code
   const sdkIntegrationCode = `// SaaS Monitoring for Node
 app.set('trust proxy', true);
@@ -33,8 +35,63 @@ Logger.init({
 
 app.use(Logger.middleware());`
 
+  const validateApiName = (value: string) => {
+    if (!value.trim()) {
+      setApiNameError("API name is required")
+      return false
+    }
+    if (value.includes(" ")) {
+      setApiNameError("API name cannot contain spaces")
+      return false
+    }
+    if (value.length > 12) {
+      setApiNameError("API name must be 12 characters or less")
+      return false
+    }
+    setApiNameError("")
+    return true
+  }
+
+  const validateApiUrl = (value: string) => {
+    if (!value.trim()) {
+      setApiUrlError("API URL is required")
+      return false
+    }
+    try {
+      const url = new URL(value)
+      if (url.protocol !== "http:" && url.protocol !== "https:") {
+        setApiUrlError("URL must use http or https protocol")
+        return false
+      }
+      setApiUrlError("")
+      return true
+    } catch {
+      setApiUrlError("Please enter a valid URL")
+      return false
+    }
+  }
+
+  const handleApiNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setApiName(value)
+    validateApiName(value)
+  }
+
+  const handleApiUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setApiUrl(value)
+    validateApiUrl(value)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const isNameValid = validateApiName(apiName)
+    const isUrlValid = validateApiUrl(apiUrl)
+
+    if (!isNameValid || !isUrlValid) {
+      return
+    }
 
     try {
       const userEmail = session?.user?.email
@@ -89,7 +146,7 @@ app.use(Logger.middleware());`
   }
 
   // Updated form validation - no longer requires SDK code input
-  const isFormValid = apiName && apiUrl && apiType && plan
+  const isFormValid = apiName && !apiNameError && apiUrl && !apiUrlError && apiType && plan
 if(loading)
     {
       return(
@@ -142,9 +199,12 @@ if(loading)
                     id="api-name"
                     placeholder="e.g., Payment API"
                     value={apiName}
-                    onChange={(e) => setApiName(e.target.value)}
-                    className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-400 focus:border-emerald-500"
+                    onChange={handleApiNameChange}
+                    className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-400 focus:border-emerald-500 ${
+                      apiNameError ? "border-red-500 focus:border-red-500" : ""
+                    }`}
                   />
+                  {apiNameError && <p className="text-red-500 text-sm">{apiNameError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="api-url" className="text-sm font-medium text-white">
@@ -154,9 +214,12 @@ if(loading)
                     id="api-url"
                     placeholder="https://api.example.com"
                     value={apiUrl}
-                    onChange={(e) => setApiUrl(e.target.value)}
-                    className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-400 focus:border-emerald-500"
+                    onChange={handleApiUrlChange}
+                    className={`bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-400 focus:border-emerald-500 ${
+                      apiUrlError ? "border-red-500 focus:border-red-500" : ""
+                    }`}
                   />
+                  {apiUrlError && <p className="text-red-500 text-sm">{apiUrlError}</p>}
                 </div>
               </div>
             </CardContent>
