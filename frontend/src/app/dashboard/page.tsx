@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Activity, AlertCircle,   LineChart, Server, Settings } from "lucide-react"
 
+import ExportButtons from "@/components/ExportButtons";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -224,7 +225,10 @@ useEffect(() => {
               <h1 className="text-2xl md:text-3xl font-bold">Hello, {session?.user?.name || "User"} 👋</h1>
               <p className="text-zinc-400 text-sm md:text-base">Welcome back to your monitoring dashboard</p>
             </div>
-
+          
+          <div className="flex items-center gap-2">
+               <ExportButtons data={apis} filename={`${session?.user?.name || "user"}-monitoring-report`} />
+            </div>
           </div>
         </div>
       </header>
