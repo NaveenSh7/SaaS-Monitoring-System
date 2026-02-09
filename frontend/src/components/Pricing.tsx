@@ -57,7 +57,12 @@ return(
                   <span>24-hour data retention</span>
                 </li>
               </ul>
-              <Button className="w-full bg-zinc-800 hover:bg-zinc-700">Get Started</Button>
+         
+<Link href="/dashboard">
+  <Button className="w-full bg-zinc-800 hover:bg-zinc-700 cursor-pointer">
+    Get Started
+  </Button>
+</Link>
             </CardContent>
           </Card>
 
@@ -94,7 +99,7 @@ return(
                 </li>
               </ul>
                <Link href="/payment" passHref>
-      <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+      <Button className="w-full bg-emerald-600 hover:bg-emerald-700 cursor-pointer">
         Purchase Now
       </Button>
     </Link>
