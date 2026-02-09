@@ -226,9 +226,10 @@ useEffect(() => {
               <p className="text-zinc-400 text-sm md:text-base">Welcome back to your monitoring dashboard</p>
             </div>
           
-          <div className="flex items-center gap-2">
-               <ExportButtons data={apis} filename={`${session?.user?.name || "user"}-monitoring-report`} />
-            </div>
+          <ExportButtons 
+              data={dashboardData} 
+              filename={`${session?.user?.name || "user"}-monitoring-report`} 
+               />
           </div>
         </div>
       </header>
