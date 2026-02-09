@@ -1,11 +1,16 @@
 "use client";
 
-import React from 'react';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import React from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface ExportProps {
-  data: DashData | null;
+  data: {
+    traffic: any[];
+    endpoints: any[];
+    countries: any[];
+    cities: any[];
+  } | null;
   filename?: string;
 }
 
@@ -39,306 +44,78 @@ interface TimestampData {
 const ExportButtons = ({ data, filename = "monitoring-report" }: ExportProps) => {
   
   const exportToCSV = () => {
-    // Check if data exists and has content
-    if (!data) {
-      alert("No data available to export. Please wait for the dashboard to load.");
-      return;
-    }
+    if (!data) return alert("No data to export");
 
-    // Check if there's any actual data to export
-    const hasData = 
-      data.countries?.length > 0 || 
-      data.cities?.length > 0 || 
-      data.endpoints?.length > 0 || 
-      data.timestamps?.length > 0;
+    const sectionToCSV = (title: string, rows: any[]) => {
+      if (!rows || rows.length === 0) return "";
 
-    if (!hasData) {
-      alert("No analytics data available. Please ensure the API has received some traffic.");
-      return;
-    }
+      const headers = Object.keys(rows[0]).join(",");
+      const values = rows
+        .map(row =>
+          Object.values(row)
+            .map(v => `"${v}"`)
+            .join(",")
+        )
+        .join("\n");
 
-    let csvContent = '';
+      return `${title}\n${headers}\n${values}\n\n`;
+    };
 
-    // Add Summary Section
-    csvContent += 'ANALYTICS SUMMARY\n';
-    csvContent += `Total Requests,${data.total_requests || 0}\n`;
-    csvContent += `Generated At,${new Date().toLocaleString()}\n`;
-    csvContent += '\n';
+    const csvContent =
+      sectionToCSV("Traffic", data.traffic) +
+      sectionToCSV("Endpoints", data.endpoints) +
+      sectionToCSV("Countries", data.countries) +
+      sectionToCSV("Cities", data.cities);
 
-    // Add Countries Section
-    if (data.countries && data.countries.length > 0) {
-      csvContent += 'COUNTRY DISTRIBUTION\n';
-      csvContent += 'Country,Request Count\n';
-      data.countries.forEach(item => {
-        csvContent += `"${item.country}",${item.count}\n`;
-      });
-      csvContent += '\n';
-    }
-
-    // Add Cities Section
-    if (data.cities && data.cities.length > 0) {
-      csvContent += 'CITY DISTRIBUTION\n';
-      csvContent += 'City,Request Count\n';
-      data.cities.forEach(item => {
-        csvContent += `"${item.city}",${item.count}\n`;
-      });
-      csvContent += '\n';
-    }
-
-    // Add Endpoints Section
-    if (data.endpoints && data.endpoints.length > 0) {
-      csvContent += 'ENDPOINT USAGE\n';
-      csvContent += 'Endpoint,Request Count\n';
-      data.endpoints.forEach(item => {
-        const endpoint = String(item.endpoint).replace(/"/g, '""');
-        csvContent += `"${endpoint}",${item.count}\n`;
-      });
-      csvContent += '\n';
-    }
-
-    // Add Traffic Timeline Section
-    if (data.timestamps && data.timestamps.length > 0) {
-      csvContent += 'TRAFFIC TIMELINE\n';
-      csvContent += 'Timestamp\n';
-      data.timestamps.forEach(item => {
-        csvContent += `"${item.timestamp}"\n`;
-      });
-    }
-
-    // Create and download CSV file
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    
-    link.setAttribute("href", url);
-    link.setAttribute("download", `${filename}-${Date.now()}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${filename}.csv`;
     link.click();
-    document.body.removeChild(link);
-    
-    URL.revokeObjectURL(url);
-    console.log('✅ CSV export successful');
   };
 
   const exportToPDF = () => {
-    // Check if data exists and has content
-    if (!data) {
-      alert("No data available to export. Please wait for the dashboard to load.");
-      return;
-    }
+    if (!data) return alert("No data to export");
 
-    // Check if there's any actual data to export
-    const hasData = 
-      data.countries?.length > 0 || 
-      data.cities?.length > 0 || 
-      data.endpoints?.length > 0 || 
-      data.timestamps?.length > 0;
+    const doc = new jsPDF();
+    let y = 14;
 
-    if (!hasData) {
-      alert("No analytics data available. Please ensure the API has received some traffic.");
-      return;
-    }
+    doc.setFontSize(16);
+    doc.text("SaaS Monitoring Report", 14, y);
+    y += 10;
 
-    try {
-      const doc = new jsPDF() as any;
-      
-      // Add title
-      doc.setFontSize(20);
-      doc.setTextColor(16, 185, 129); // Emerald color
-      doc.text("SaaS Monitoring Report", 14, 20);
-      
-      // Add metadata
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
-      doc.text(`Total Requests: ${data.total_requests || 0}`, 14, 34);
-      
-      // Reset text color
-      doc.setTextColor(0, 0, 0);
-      
-      let yPosition = 45;
+    const addTable = (title: string, rows: any[]) => {
+      if (!rows || rows.length === 0) return;
 
-      // Country Distribution Section
-      if (data.countries && data.countries.length > 0) {
-        doc.setFontSize(14);
-        doc.setTextColor(16, 185, 129);
-        doc.text("Country Distribution", 14, yPosition);
-        doc.setTextColor(0, 0, 0);
-        yPosition += 7;
+      doc.setFontSize(13);
+      doc.text(title, 14, y);
+      y += 4;
 
-        const countryRows = data.countries.map(item => [
-          item.country,
-          String(item.count)
-        ]);
+      autoTable(doc, {
+        startY: y,
+        head: [Object.keys(rows[0])],
+        body: rows.map(row => Object.values(row)),
+        theme: "grid",
+      });
 
-        doc.autoTable({
-          startY: yPosition,
-          head: [['Country', 'Requests']],
-          body: countryRows,
-          theme: 'striped',
-          styles: { 
-            fontSize: 9,
-            cellPadding: 3
-          },
-          headStyles: { 
-            fillColor: [16, 185, 129],
-            textColor: [255, 255, 255],
-            fontStyle: 'bold'
-          },
-          margin: { left: 14, right: 14 }
-        });
+      // move Y below table
+      // @ts-ignore
+      y = doc.lastAutoTable.finalY + 10;
+    };
 
-        yPosition = doc.lastAutoTable.finalY + 12;
-      }
+    addTable("Traffic", data.traffic);
+    addTable("Endpoints", data.endpoints);
+    addTable("Countries", data.countries);
+    addTable("Cities", data.cities);
 
-      // City Distribution Section
-      if (data.cities && data.cities.length > 0) {
-        // Add new page if needed
-        if (yPosition > 240) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(14);
-        doc.setTextColor(16, 185, 129);
-        doc.text("City Distribution", 14, yPosition);
-        doc.setTextColor(0, 0, 0);
-        yPosition += 7;
-
-        const cityRows = data.cities.map(item => [
-          item.city,
-          String(item.count)
-        ]);
-
-        doc.autoTable({
-          startY: yPosition,
-          head: [['City', 'Requests']],
-          body: cityRows,
-          theme: 'striped',
-          styles: { 
-            fontSize: 9,
-            cellPadding: 3
-          },
-          headStyles: { 
-            fillColor: [16, 185, 129],
-            textColor: [255, 255, 255],
-            fontStyle: 'bold'
-          },
-          margin: { left: 14, right: 14 }
-        });
-
-        yPosition = doc.lastAutoTable.finalY + 12;
-      }
-
-      // Endpoint Usage Section
-      if (data.endpoints && data.endpoints.length > 0) {
-        // Add new page if needed
-        if (yPosition > 240) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(14);
-        doc.setTextColor(16, 185, 129);
-        doc.text("Endpoint Usage", 14, yPosition);
-        doc.setTextColor(0, 0, 0);
-        yPosition += 7;
-
-        const endpointRows = data.endpoints.map(item => [
-          String(item.endpoint),
-          String(item.count)
-        ]);
-
-        doc.autoTable({
-          startY: yPosition,
-          head: [['Endpoint', 'Requests']],
-          body: endpointRows,
-          theme: 'striped',
-          styles: { 
-            fontSize: 9,
-            cellPadding: 3
-          },
-          headStyles: { 
-            fillColor: [16, 185, 129],
-            textColor: [255, 255, 255],
-            fontStyle: 'bold'
-          },
-          margin: { left: 14, right: 14 },
-          columnStyles: {
-            0: { cellWidth: 100 }
-          }
-        });
-
-        yPosition = doc.lastAutoTable.finalY + 12;
-      }
-
-      // Traffic Timeline Section (show first 20 timestamps)
-      if (data.timestamps && data.timestamps.length > 0) {
-        // Add new page if needed
-        if (yPosition > 240) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(14);
-        doc.setTextColor(16, 185, 129);
-        doc.text(`Traffic Timeline (Last ${Math.min(data.timestamps.length, 20)} entries)`, 14, yPosition);
-        doc.setTextColor(0, 0, 0);
-        yPosition += 7;
-
-        // Only show last 20 timestamps to avoid PDF being too large
-        const recentTimestamps = data.timestamps.slice(-20);
-        const timestampRows = recentTimestamps.map(item => [
-          item.timestamp
-        ]);
-
-        doc.autoTable({
-          startY: yPosition,
-          head: [['Timestamp']],
-          body: timestampRows,
-          theme: 'striped',
-          styles: { 
-            fontSize: 8,
-            cellPadding: 2
-          },
-          headStyles: { 
-            fillColor: [16, 185, 129],
-            textColor: [255, 255, 255],
-            fontStyle: 'bold'
-          },
-          margin: { left: 14, right: 14 }
-        });
-      }
-
-      // Add footer
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150, 150, 150);
-        doc.text(
-          `Page ${i} of ${pageCount}`,
-          doc.internal.pageSize.width / 2,
-          doc.internal.pageSize.height - 10,
-          { align: 'center' }
-        );
-      }
-
-      // Save PDF
-      doc.save(`${filename}-${Date.now()}.pdf`);
-      console.log('✅ PDF export successful');
-      
-    } catch (error) {
-      console.error('❌ Error generating PDF:', error);
-      alert('Error generating PDF. Please check console for details.');
-    }
+    doc.save(`${filename}.pdf`);
   };
 
   return (
-    <div className="flex gap-2">
-      <button 
+    <div className="flex gap-2 my-4">
+      <button
         onClick={exportToCSV}
         className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         title="Export analytics data as CSV file"
@@ -346,11 +123,10 @@ const ExportButtons = ({ data, filename = "monitoring-report" }: ExportProps) =>
       >
         📊 Export CSV
       </button>
-      <button 
+
+      <button
         onClick={exportToPDF}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        title="Export analytics data as PDF file"
-        disabled={!data}
+        className="px-4 py-2 bg-white text-black rounded-md hover:bg-gray-500 hover:text-white text-sm font-medium"
       >
         📄 Export PDF
       </button>
