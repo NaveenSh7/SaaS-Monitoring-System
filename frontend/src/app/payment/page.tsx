@@ -6,23 +6,13 @@ import axios from "axios";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { signIn, signOut, useSession } from "next-auth/react";
-
-import Link from "next/link"
-import Image from "next/image"
 import {
-  Activity,
-  AlertCircle,
-  ArrowRight,
+
   CheckCircle2,
-  Code,
-  Database,
-  LineChart,
-  Loader2,
-  Shield,
-  Zap,
+
 } from "lucide-react"
 
-
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 // Add Razorpay type declaration to window
 declare global {
@@ -52,9 +42,10 @@ const { data: session } = useSession()
       return;
     }
 
-    const orderData = await axios.post("http://localhost:5000/api/payment/order", {
-      amount,
-    });
+    const orderData = await axios.post(
+  `${BACKEND_URL}/api/payment/order`,
+  { amount }
+);
 
     const options = {
       key: process.env.NEXT_PUBLIC_Razpy_Key_Id, // Your Razorpay Test Key ID
@@ -69,7 +60,7 @@ const { data: session } = useSession()
 
             // Call backend to store payment in DB
     try {
-     const resp = await axios.post("http://localhost:5000/api/payment/verify", {
+     const resp = await axios.post(`${BACKEND_URL}/api/payment/verify`, {
         payment_id: response.razorpay_payment_id,
         order_id: response.razorpay_order_id,
         signature: response.razorpay_signature,

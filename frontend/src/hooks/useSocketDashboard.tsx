@@ -1,7 +1,7 @@
 // hooks/useSocketDashboard.ts
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 interface DashboardData {
   StatusData: string;
   HoursData: HoursData1[];
@@ -28,7 +28,7 @@ export const useSocketDashboard = (selectedAPI: string ) => {
   useEffect(() => {
      setLoading(true);
 
-    socket = io('http://localhost:5000'); // backend WebSocket server
+    socket = io(BACKEND_URL); // backend WebSocket server
     
     socket.emit('GetDashboardData', { selectedAPI });
 

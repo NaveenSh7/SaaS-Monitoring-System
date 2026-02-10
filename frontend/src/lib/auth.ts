@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,7 +13,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user }) {
       try {
-        await axios.post("http://localhost:5000/api/users", {
+        await axios.post(`${BACKEND_URL}/api/users`, {
           name: user.name,
           email: user.email,
           services: [], // empty array for now

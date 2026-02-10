@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 import axios from "axios";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 // Development mode: Use mock auth if Google credentials are not provided
 const isDevelopmentMode = process.env.NODE_ENV === 'development' && 
@@ -43,7 +44,7 @@ const authOptions: NextAuthOptions = {
       }
 
       try {
-        await axios.post("http://localhost:5000/api/users", {
+        await axios.post(`${BACKEND_URL}/api/users`, {
           name: user.name,
           email: user.email,
           services: [],

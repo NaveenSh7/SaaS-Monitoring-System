@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Loader from "@/components/Loader"
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function AddAPI() {
   const router = useRouter()
   const { data: session } = useSession()
@@ -95,12 +97,12 @@ app.use(Logger.middleware());`
 
     try {
       const userEmail = session?.user?.email
-      const userRes = await axios.get(`http://localhost:5000/api/users?email=${userEmail}`)
+      const userRes = await axios.get(`${BACKEND_URL}/api/users?email=${userEmail}`)
       const userId = userRes.data.id
 
       console.log(userId)
   setLoading(true)
-      const response = await axios.post("http://localhost:5000/api/apis", {
+      const response = await axios.post(`${BACKEND_URL}/api/apis`, {
         user_id: userId,
         name: apiName,
         url: apiUrl,

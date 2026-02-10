@@ -17,8 +17,7 @@ import EndpointChart from "@/components/charts/EndpointChart"
 import TrafficChart from "@/components/charts/TrafficChart"
 import InfoChart from "@/components/charts/InfoChart"
 
-import { useSocketDashboard } from "@/hooks/useSocketDashboard"
-
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 interface ApiData {
   id: string
   name: string
@@ -113,13 +112,13 @@ export default function Dashboard() {
 
       try {
         const userEmail = session.user.email;
-        const userRes = await fetch(`http://localhost:5000/api/users?email=${userEmail}`);
+        const userRes = await fetch(`${BACKEND_URL}/api/users?email=${userEmail}`);
         if (!userRes.ok) throw new Error("Failed to fetch user");
 
         const userData = await userRes.json();
         const userId = userData.id;
 
-        const response = await fetch(`http://localhost:5000/api/apis?user_id=${userId}`);
+        const response = await fetch(`${BACKEND_URL}/api/apis?user_id=${userId}`);
         if (response.ok) {
           const data = await response.json();
           setApis(data);
@@ -146,7 +145,7 @@ export default function Dashboard() {
       if (!selectedAPI) return;
 
       try {
-        const response = await fetch(`http://localhost:5000/api/uptime?api_id=${selectedAPI}`);
+        const response = await fetch( `${BACKEND_URL}/api/uptime?api_id=${selectedAPI}`);
         const data = await response.json();
         setUptimes(data);
         // console.log(data)
@@ -164,7 +163,7 @@ export default function Dashboard() {
       if (!selectedAPI) return;
 
       try {
-        const response = await fetch(`http://localhost:5000/api/dashboard?api_id=${selectedAPI}`);
+        const response = await fetch(`${BACKEND_URL}/api/dashboard?api_id=${selectedAPI}`);
         const data = await response.json();
 
         setdashboardData(data);
