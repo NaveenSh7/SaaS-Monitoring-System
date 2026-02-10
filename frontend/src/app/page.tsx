@@ -44,7 +44,7 @@ const { data: session, status } = useSession();
      <Navbar/>
 
       {/* Hero Section */}
-      <section className="container py-20 md:py-32">
+      <section id="hero" className="container py-20 md:py-32">
         <div className="grid gap-8 md:grid-cols-2 md:gap-12">
           <div className="flex flex-col justify-center space-y-4">
             <div className="inline-block rounded-full bg-emerald-900/30 px-3 py-1 text-sm text-emerald-400">
