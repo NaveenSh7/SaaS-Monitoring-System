@@ -28,16 +28,16 @@ return(
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-emerald-500" />
-            <Link href="/" className="text-xl font-bold">Saas-Monitor</Link>
+            <Link href="#hero" className="text-xl font-bold">Saas-Monitor</Link>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link href="#features" className="text-sm font-medium text-zinc-400 hover:text-white">
               Features
             </Link>
-            <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link href="#pricing" className="text-sm font-medium text-zinc-400 hover:text-white">
               Pricing
             </Link>
-            <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link href="#documention" className="text-sm font-medium text-zinc-400 hover:text-white">
               Documentation
             </Link>
 
