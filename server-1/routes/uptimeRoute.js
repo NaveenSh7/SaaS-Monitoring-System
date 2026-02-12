@@ -46,6 +46,15 @@ router.put('/', async (req, res) => {
 
     const last = current.rows[0];
 
+    // If the initial row was created without status, initialize it now
+    if (!last.status) {
+      await db.query(
+        'UPDATE uptimes SET status = $1, started_at = $2, latency = $3 WHERE id = $4',
+        [status, now, latency, last.id]
+      );
+      return res.status(200).json({ message: 'Initialized first status row' });
+    }
+
 
    if (last.status.toLowerCase() === status.toLowerCase()) {
       // Same status, just update latency if you want
@@ -112,25 +121,40 @@ router.get('/' , async (req,res)=>{
     const {api_id } = req.query;
     
     const hours = await db.query(
-        'SELECT status, ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(ended_at, NOW()) - started_at)) / 3600), 2)AS total_hours FROM uptimes WHERE api_id=$1 GROUP BY status',
-        [api_id]
-      );
+      `SELECT status,
+              ROUND(
+                SUM(
+                  EXTRACT(
+                    EPOCH FROM (COALESCE(ended_at, NOW() AT TIME ZONE 'Asia/Kolkata') - started_at)
+                  ) / 3600
+                ),
+                2
+              ) AS total_hours
+       FROM uptimes
+       WHERE api_id = $1
+       GROUP BY status`,
+      [api_id]
+    );
     const status = await db.query(
       'SELECT status FROM uptimes WHERE api_id=$1 AND ended_at is NULL ORDER BY started_at DESC LIMIT 1',[api_id]
     );
       const latency = await db.query(
       'SELECT latency FROM uptimes WHERE api_id=$1 AND ended_at is NULL ORDER BY started_at DESC LIMIT 1',[api_id]
     );
-    const timestamps = await db.query(`
-      SELECT 
+    const timestamps = await db.query(
+      `
+      SELECT
         status,
         started_at + INTERVAL '5 hours 30 minutes' as started_at,
-        COALESCE(ended_at, NOW()) + INTERVAL '5 hours 30 minutes' as ended_at
-      FROM uptimes 
-      WHERE api_id = $1 
-        AND COALESCE(ended_at, NOW()) >= NOW() - INTERVAL '7 days'
-      ORDER BY COALESCE(ended_at, NOW()) DESC
-    `, [api_id]);
+        COALESCE(ended_at, NOW() AT TIME ZONE 'Asia/Kolkata') + INTERVAL '5 hours 30 minutes' as ended_at
+      FROM uptimes
+      WHERE api_id = $1
+        AND COALESCE(ended_at, NOW() AT TIME ZONE 'Asia/Kolkata')
+            >= (NOW() AT TIME ZONE 'Asia/Kolkata') - INTERVAL '7 days'
+      ORDER BY COALESCE(ended_at, NOW() AT TIME ZONE 'Asia/Kolkata') DESC
+    `,
+      [api_id]
+    );
 
 
 

@@ -92,9 +92,6 @@ export default function Dashboard() {
   const [uptimes, setUptimes] = useState<UptimeData | null>(null);
   const [dashboardData, setdashboardData] = useState<DashData | null>(null);
 
-  if (status === "loading") {
-    return <Loader />;
-  }
   // if user is not authenticated redirect to login page
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -108,7 +105,7 @@ export default function Dashboard() {
   const exportData = dashboardData
     ? {
         traffic: dashboardData.timestamps.map((t, i) => ({
-          timestamp: t.timestamp, // 👈 FIX
+          timestamp: t.timestamp,
         })),
         endpoints: dashboardData.endpoints || [],
         countries: dashboardData.countries || [],
@@ -118,6 +115,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchApis = async () => {
+      if (!BACKEND_URL) {
+        console.error("NEXT_PUBLIC_BACKEND_URL is not set");
+        setLoading(false);
+        return;
+      }
       if (!session?.user?.email) return;
 
       try {
@@ -125,7 +127,12 @@ export default function Dashboard() {
         const userRes = await fetch(
           `${BACKEND_URL}/api/users?email=${userEmail}`,
         );
-        if (!userRes.ok) throw new Error("Failed to fetch user");
+        if (!userRes.ok) {
+          const errText = await userRes.text();
+          throw new Error(
+            `Failed to fetch user: ${userRes.status} ${userRes.statusText} ${errText}`,
+          );
+        }
 
         const userData = await userRes.json();
         const userId = userData.id;
@@ -192,6 +199,16 @@ export default function Dashboard() {
     fetchDashboard();
   }, [selectedAPI]);
 
+  const getHealthStatus = () => {
+    if (!uptimes?.status?.status) return "unknown";
+    const apiStatus = uptimes.status.status.toLowerCase();
+    const latency = uptimes?.latency?.latency ?? 0;
+
+    if (apiStatus === "down") return "error";
+    if (latency > 500) return "warning";
+    return "healthy";
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "healthy":
@@ -216,13 +233,13 @@ export default function Dashboard() {
       case "warning":
         return (
           <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-600">
-            Warning
+            High Latency
           </Badge>
         );
       case "error":
         return (
           <Badge className="bg-red-900/30 text-red-400 border-red-600">
-            Error
+            Down
           </Badge>
         );
       default:
@@ -254,17 +271,21 @@ export default function Dashboard() {
     );
   }
 
+  if (status === "loading") {
+    return <Loader />;
+  }
+
   // console.log(uptimes)
   return (
     <div className="min-h-screen bg-black text-white px-4">
       <Navbar />
       {/* Header */}
       <header className="border-b border-zinc-800 bg-black/95 backdrop-blur">
-        <div className="container px-4 py-6">
+        <div className="mx-auto w-full max-w-screen-2xl px-6 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">
-                Hello, {session?.user?.name || "User"} 👋
+                Hello, {session?.user?.name || "User"}
               </h1>
               <p className="text-zinc-400 text-sm md:text-base">
                 Welcome back to your monitoring dashboard
@@ -274,7 +295,7 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <div className="container px-4 py-6 md:py-8">
+      <div className="mx-auto w-full max-w-screen-2xl px-6 py-6 md:py-8">
         {/* API Selection */}
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
@@ -327,32 +348,44 @@ export default function Dashboard() {
             </Card>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {apis.map((api) => (
-                <Card
-                  key={api.id}
-                  className={`cursor-pointer transition-all border-2 ${
-                    selectedAPI === api.id
-                      ? "border-emerald-600 bg-emerald-900/10"
-                      : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
-                  }`}
-                  onClick={() => setSelectedAPI(api.id)}
-                >
-                  <CardContent className="p-4 text-white">
-                    <div className="flex items-start justify-between mb-2">
-                      <div
-                        className={`w-3 h-3 rounded-full ${getStatusColor("healthy")}`}
-                      />
-                      {getStatusBadge("healthy")}
-                    </div>
-                    <h3 className="font-semibold mb-1 text-sm md:text-base">
-                      {api.name}
-                    </h3>
-                    <p className="text-zinc-400 text-xs md:text-sm">
-                      {api.url}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+              {apis.map((api) => {
+                const cardStatus =
+                  selectedAPI === api.id ? getHealthStatus() : "unknown";
+                const selectedBorder =
+                  cardStatus === "healthy"
+                    ? "border-emerald-600 bg-emerald-900/10"
+                    : cardStatus === "warning"
+                      ? "border-yellow-600 bg-yellow-900/10"
+                      : cardStatus === "error"
+                        ? "border-red-600 bg-red-900/10"
+                        : "border-zinc-700 bg-zinc-900/10";
+                return (
+                  <Card
+                    key={api.id}
+                    className={`cursor-pointer transition-all border-2 ${
+                      selectedAPI === api.id
+                        ? selectedBorder
+                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                    }`}
+                    onClick={() => setSelectedAPI(api.id)}
+                  >
+                    <CardContent className="p-4 text-white">
+                      <div className="flex items-start justify-between mb-2">
+                        <div
+                          className={`w-3 h-3 rounded-full ${getStatusColor(cardStatus)}`}
+                        />
+                        {getStatusBadge(cardStatus)}
+                      </div>
+                      <h3 className="font-semibold mb-1 text-sm md:text-base">
+                        {api.name}
+                      </h3>
+                      <p className="text-zinc-400 text-xs md:text-sm">
+                        {api.url}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>
@@ -363,12 +396,12 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-4 h-4 rounded-full ${getStatusColor("healthy")}`}
+                  className={`w-4 h-4 rounded-full ${getStatusColor(getHealthStatus())}`}
                 />
                 <h3 className="text-xl md:text-2xl font-bold">
                   {selectedAPIData.name}
                 </h3>
-                {getStatusBadge("healthy")}
+                {getStatusBadge(getHealthStatus())}
               </div>
               <div className="flex gap-2">
                 <Button
@@ -412,7 +445,7 @@ export default function Dashboard() {
 
             {/* // EndpointChart & Traffic value chart */}
 
-            <div className="grid gap-6 lg:grid-cols-2 w-screen ml-4">
+            <div className="grid gap-6 lg:grid-cols-2">
               <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
