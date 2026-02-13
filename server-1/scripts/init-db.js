@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS uptimes (
   status TEXT,
   started_at TIMESTAMP,
   ended_at TIMESTAMP,
-  latency INTEGER
+  latency INTEGER,
+  email_sent BOOLEAN DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS logs (
@@ -54,10 +55,6 @@ CREATE TABLE IF NOT EXISTS logs (
   city TEXT,
   endpoint TEXT
 );
-
-CREATE INDEX IF NOT EXISTS idx_logs_api_id ON logs(api_id);
-CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON logs(timestamp);
-CREATE INDEX IF NOT EXISTS idx_uptimes_api_id ON uptimes(api_id);
 
 COMMIT;
 `;
