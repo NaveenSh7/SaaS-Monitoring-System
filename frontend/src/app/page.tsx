@@ -67,16 +67,15 @@ const { data: session, status } = useSession();
             <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             </Link>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white cursor-pointer"
-                  onClick={() => {
-                       document.getElementById('documention')?.scrollIntoView({ behavior: 'smooth' });
-                 }} 
-              >
-                View Documentation
-              </Button>
+              <Link href="/documentation">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white cursor-pointer"
+                >
+                  View Documentation
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="relative flex items-center justify-center">
@@ -96,69 +95,48 @@ const { data: session, status } = useSession();
 
       {/* Features Section */}
     <Features/>
-{/* Integration Section */}
-<section className="container py-20 border-t border-zinc-800" id="documention" >
-  <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
-    {/* Left Side (Same) */}
-    <div>
-      <h2 className="text-3xl font-bold mb-4">Simple Integration</h2>
-      <p className="text-zinc-400 mb-6">
-        Add our SDK to your application in minutes. Start monitoring with just a few lines of code.
+{/* Supported Servers Section */}
+<section className="container py-20 border-t border-zinc-800">
+  <div className="text-center mb-12">
+    <h2 className="text-3xl font-bold mb-4">Supported Server Frameworks</h2>
+    <p className="text-zinc-400 max-w-2xl mx-auto mb-8">
+      Our SDK supports multiple popular server frameworks and runtimes
+    </p>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    {/* Node/Express */}
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center hover:border-emerald-500/50 transition-colors">
+      <h3 className="text-xl font-semibold text-white mb-2">Node/Express</h3>
+      <p className="text-zinc-400 text-sm">
+        Lightweight middleware for Express and Node.js applications
       </p>
-      <div className="space-y-4 text-white">
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <span>Works with React.Js and Next.Js</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <span>Zero performance impact</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <span>Automatic error tracking</span>
-        </div>
-      </div>
     </div>
 
-    {/* Right Side (3-Step Boxes) */}
-    <div className="space-y-6">
-      {/* Step 1 */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 1: Install the SDK</h3>
-        <pre className="text-sm bg-zinc-950 p-3 rounded-md overflow-x-auto">
-          <code className="language-bash text-zinc-100">
-{`npm i saas-monitering-sdk`}
-          </code>
-        </pre>
-      </div>
-
-      {/* Step 2 */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 2: Get your API key</h3>
-        <p className="text-zinc-400 text-sm">
-          Retrieve the <span className="text-white font-medium">api_key</span> for your corresponding service from your SaaS Monitoring Dashboard.
-        </p>
-      </div>
-
-      {/* Step 3 */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 overflow-hidden">
-        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 3: Add this code to your entry server's point</h3>
-        <pre className="text-sm bg-zinc-950 p-3 rounded-md overflow-x-auto">
-          <code className="language-javascript text-zinc-100">
-{`// SaaS Monitoring for Node
-app.set('trust proxy', true);
-const Logger = require('saas-monitering-sdk');
-
-Logger.init({
-  api_key: 'your_api_key',
-});
-
-app.use(Logger.middleware());`}
-          </code>
-        </pre>
-      </div>
+    {/* FastAPI */}
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center hover:border-emerald-500/50 transition-colors">
+      <h3 className="text-xl font-semibold text-white mb-2">FastAPI</h3>
+      <p className="text-zinc-400 text-sm">
+        Modern Python framework with automatic API documentation
+      </p>
     </div>
+
+    {/* Next.js */}
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center hover:border-emerald-500/50 transition-colors">
+      <h3 className="text-xl font-semibold text-white mb-2">Next.js</h3>
+      <p className="text-zinc-400 text-sm">
+        Full-stack React framework with server components support
+      </p>
+    </div>
+  </div>
+
+  <div className="flex justify-center">
+    <Link href="/documentation">
+      <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+        View Integration Guide
+        <ArrowRight className="ml-2 h-4 w-4" />
+      </Button>
+    </Link>
   </div>
 </section>
 
