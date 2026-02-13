@@ -36,20 +36,28 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('🟢 Client connected:', socket.id);
+  console.log('Client connected:', socket.id);
 
   let intervalId = null;
 
   socket.on('GetDashboardData', async ({ selectedAPI  }) => {
-    console.log(`📡 GetDashboardData for API: ${selectedAPI}`);
+    console.log(`GetDashboardData for API: ${selectedAPI}`);
     api_id = Number(selectedAPI );
 
     const sendDashboardData = async () => {
 try {
         const hoursRes = await db.query(
-          `SELECT status, ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(ended_at, NOW()) - started_at)) / 3600), 2) AS total_hours 
-           FROM uptimes 
-           WHERE api_id = $1 
+          `SELECT status,
+                  ROUND(
+                    SUM(
+                      EXTRACT(
+                        EPOCH FROM (COALESCE(ended_at, NOW() AT TIME ZONE 'Asia/Kolkata') - started_at)
+                      ) / 3600
+                    ),
+                    2
+                  ) AS total_hours
+           FROM uptimes
+           WHERE api_id = $1
            GROUP BY status`,
           [api_id]
         );
@@ -109,7 +117,7 @@ const hours = [
       }
     }
  
-    // 🛑 Clear any previous interval immediately
+    // Clear any previous interval immediately
   
     sendDashboardData()
 
@@ -129,7 +137,7 @@ const hours = [
 
   socket.on('disconnect', () => {
     clearInterval(intervalId);
-    console.log('🔌 Client disconnected:', socket.id);
+    console.log('Client disconnected:', socket.id);
   });
 });
 

@@ -26,19 +26,35 @@ export const useSocketDashboard = (selectedAPI: string ) => {
   });
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-     setLoading(true);
+    if (!BACKEND_URL || !selectedAPI) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    const loadingTimeout = setTimeout(() => {
+      // Avoid infinite skeleton if backend never responds
+      setLoading(false);
+    }, 5000);
 
     socket = io(BACKEND_URL); // backend WebSocket server
-    
+
     socket.emit('GetDashboardData', { selectedAPI });
 
     socket.on('DashboardData', (incomingData) => {
-        // console.log(incomingData)
-           setLoading(false); // ✅ data received
+      setLoading(false); // ✅ data received
+      clearTimeout(loadingTimeout);
       setData(incomingData);
     });
 
+    socket.on('connect_error', () => {
+      setLoading(false);
+      clearTimeout(loadingTimeout);
+    });
+
     return () => {
+      clearTimeout(loadingTimeout);
       socket.emit('disconnectFromApi', { selectedAPI });
       socket.disconnect();
     };

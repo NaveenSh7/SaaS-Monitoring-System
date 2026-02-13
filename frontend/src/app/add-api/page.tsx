@@ -26,6 +26,8 @@ export default function AddAPI() {
   const [loading, setLoading] = useState(false)
   const [apiNameError, setApiNameError] = useState("")
   const [apiUrlError, setApiUrlError] = useState("")
+  const [apiTypeError, setApiTypeError] = useState("")
+  const [planError, setPlanError] = useState("")
   // Pre-written SDK integration code
   const sdkIntegrationCode = `// SaaS Monitoring for Node
 app.set('trust proxy', true);
@@ -90,15 +92,27 @@ app.use(Logger.middleware());`
 
     const isNameValid = validateApiName(apiName)
     const isUrlValid = validateApiUrl(apiUrl)
+    if (!apiType) setApiTypeError("Please select an API type")
+    else setApiTypeError("")
+    if (!plan) setPlanError("Please select a plan")
+    else setPlanError("")
 
-    if (!isNameValid || !isUrlValid) {
+    if (!isNameValid || !isUrlValid || !apiType || !plan) {
       return
     }
 
     try {
       const userEmail = session?.user?.email
       const userRes = await axios.get(`${BACKEND_URL}/api/users?email=${userEmail}`)
-      const userId = userRes.data.id
+      let userId = userRes.data?.id
+      if (!userId) {
+        const created = await axios.post(`${BACKEND_URL}/api/users`, {
+          name: session?.user?.name || "Dev User",
+          email: userEmail,
+          services: [],
+        })
+        userId = created.data?.id
+      }
 
       console.log(userId)
   setLoading(true)

@@ -29,7 +29,7 @@ const timestamps = await db.query(
     
 
   } catch (error) {
-        console.error(err);
+        console.error(error);
         res.status(500).json({ message: 'Error fetching dashboard data' });
   }
 })

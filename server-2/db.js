@@ -6,7 +6,7 @@ const pool = new Pool({
   max: 5, // Safe for Supabase Free tier
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 5000,
-  ssl: { rejectUnauthorized: false },
+  ssl: false,
 });
 
 pool.on('connect', () => {
@@ -18,4 +18,3 @@ pool.on('error', (err) => {
 });
 
 module.exports = pool;
-
