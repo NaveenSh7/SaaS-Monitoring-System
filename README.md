@@ -14,6 +14,7 @@ This project follows an **open-core SaaS model**: the core monitoring infrastruc
 - server-2/ → Traffic ingestion service
 - logger-sdk/ → Lightweight monitoring SDK
 
+* Using V0 for UI designs is encouraged.
 
 Please feel free to contact me if u need any assistance.
 
