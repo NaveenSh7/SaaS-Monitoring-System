@@ -12,7 +12,7 @@ const getAllApis = async () => {
 //     'INSERT INTO apis (user_id , name ,url) VALUES ($1, $2, $3) RETURNING *',
 //     [user_id , name ,url]
 //   );
-  
+
 //   return result.rows[0];
 // };
 
@@ -32,7 +32,7 @@ const createApi = async (apiData) => {
     const newApi = result.rows[0]
 
     // 2. Immediately insert into uptimes table
-        // const started_at =  moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
+    // const started_at =  moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
     await db.query(
       `INSERT INTO uptimes (api_id )
        VALUES ($1 )`,
@@ -47,30 +47,37 @@ const createApi = async (apiData) => {
 }
 
 
-const getApi = async (user_id)=>{
+const getApi = async (user_id) => {
 
-    const result = await db.query(
-        'SELECT * FROM apis WHERE user_id = $1',[user_id]
-    );
-    
-    return result.rows;
- 
+  const result = await db.query(
+    'SELECT * FROM apis WHERE user_id = $1', [user_id]
+  );
+
+  return result.rows;
+
 }
-const updateApi = async (api_id , name ,url)=>{
+const updateApi = async (api_id, name, url) => {
 
-    const result = await db.query(
-          'UPDATE apis SET name = $1, url = $2 WHERE id = $3 RETURNING *',[ name ,url, api_id]
-    );
-    return result.rows[0];
+  const result = await db.query(
+    'UPDATE apis SET name = $1, url = $2 WHERE id = $3 RETURNING *', [name, url, api_id]
+  );
+  return result.rows[0];
 }
 
+const getApiCount = async (user_id) => {
+  const result = await db.query(
+    'SELECT COUNT(*) FROM apis WHERE user_id = $1',
+    [user_id]
+  );
+  return parseInt(result.rows[0].count, 10);
+};
 
 module.exports = {
-
-getAllApis,
-getApi,
-createApi,
-updateApi
+  getAllApis,
+  getApi,
+  createApi,
+  updateApi,
+  getApiCount
 };
 
 
