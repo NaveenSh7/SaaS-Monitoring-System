@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
 
   socket.on("GetDashboardData", async ({ selectedAPI }) => {
     console.log(`GetDashboardData for API: ${selectedAPI}`);
-    api_id = Number(selectedAPI);
+    const api_id = Number(selectedAPI);
 
     const sendDashboardData = async () => {
       try {
