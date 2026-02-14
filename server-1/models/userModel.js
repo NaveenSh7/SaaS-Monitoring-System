@@ -46,11 +46,21 @@ const deleteUser = async (email) => {
   );
     return result.rows[0];
 }
+// const updateUserServiceCount = async (user_id, count) => {
+//   const result = await db.query(
+//     "UPDATE users SET services = $1 WHERE id = $2 RETURNING *",
+//     [count, user_id]
+//   );
+
+//   return result.rows[0];
+// };
+
 
 module.exports = {
   getAllUsers,
   createUser,
   getUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  // updateUserServiceCount
 };
