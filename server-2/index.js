@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5001;
 
 // CORS Configuration - Use environment variable for security
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
+  ? process.env.ALLOWED_ORIGINS.split(",").map(origin => origin.trim()).filter(Boolean)
   : ["http://localhost:3000"];
 
 const corsOptions = {
