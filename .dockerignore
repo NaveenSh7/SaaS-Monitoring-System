@@ -1,0 +1,14 @@
+.git
+.github
+.gitignore
+*.md
+.DS_Store
+.vscode
+.env
+.env.local
+node_modules
+*/node_modules
+*/npm-debug.log
+*/.next
+*/coverage
+LICENSE
