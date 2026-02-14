@@ -64,11 +64,7 @@ const OPTIONAL_VARS = [
     description: 'PostgreSQL database name (default: saas_monitoring)',
     default: 'saas_monitoring',
   },
-  {
-    name: 'ALLOWED_ORIGINS',
-    description: 'CORS allowed origins (default: http://localhost:3000)',
-    default: 'http://localhost:3000',
-  },
+
 ];
 
 function log(message, color = 'reset') {
