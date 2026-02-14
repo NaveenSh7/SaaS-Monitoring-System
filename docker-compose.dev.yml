@@ -1,0 +1,105 @@
+version: "3.8"
+
+# Development Docker Compose with hot-reloading
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: saas-postgres-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your POSTGRES_PASSWORD
+      POSTGRES_DB: saas_monitoring
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - saas-network
+
+  # Server-1: Main API Server (Development mode with nodemon)
+  server-1:
+    build:
+      context: ./server-1
+      dockerfile: Dockerfile.dev
+    container_name: saas-server-1-dev
+    environment:
+      DATABASE_URL: postgresql://postgres:Abba@12345678bnn@postgres:5432/saas_monitoring
+      PORT: 5000
+      NODE_ENV: development
+      Key_Id: ${RAZORPAY_KEY_ID:-rzp_test_XXXXX}
+      Key_Secret: ${RAZORPAY_KEY_SECRET:-XXXXX}
+      ALLOWED_ORIGINS: http://localhost:3000
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server-1:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - saas-network
+    command: npm run dev
+
+  # Server-2: Traffic Logging Server (Development mode with nodemon)
+  server-2:
+    build:
+      context: ./server-2
+      dockerfile: Dockerfile.dev
+    container_name: saas-server-2-dev
+    environment:
+      DATABASE_URL: postgresql://postgres:Abba@12345678bnn@postgres:5432/saas_monitoring
+      PORT: 5001
+      NODE_ENV: development
+      ALLOWED_ORIGINS: http://localhost:3000
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./server-2:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - saas-network
+    command: npm run dev
+
+  # Frontend: Next.js Application (Development mode with hot reload)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: saas-frontend-dev
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:5000
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_PUBLIC_Razpy_Key_Id: ${RAZORPAY_KEY_ID:-rzp_test_XXXXX}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - server-1
+      - server-2
+    networks:
+      - saas-network
+    command: npm run dev
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  saas-network:
+    driver: bridge
