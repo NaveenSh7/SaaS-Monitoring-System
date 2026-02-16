@@ -18,7 +18,7 @@ return(
 <>
       {/* Footer */}
       <footer className="border-t border-zinc-800 py-12">
-        <div className="container">
+        <div className="container mx-auto">
           <div className="grid gap-8 md:grid-cols-4">
             <div>
               <div className="flex items-center gap-2 mb-4">

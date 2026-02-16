@@ -44,7 +44,7 @@ const { data: session, status } = useSession();
      <Navbar/>
 
       {/* Hero Section */}
-      <section id="hero" className="container py-20 md:py-32">
+      <section id="hero" className="container py-20 md:py-32 mx-auto">
         <div className="grid gap-8 md:grid-cols-2 md:gap-12">
           <div className="flex flex-col justify-center space-y-4">
             <div className="inline-block rounded-full bg-emerald-900/30 px-3 py-1 text-sm text-emerald-400">
@@ -97,7 +97,7 @@ const { data: session, status } = useSession();
       {/* Features Section */}
     <Features/>
 {/* Integration Section */}
-<section className="container py-20 border-t border-zinc-800" id="documention" >
+<section className="container py-20 border-t border-zinc-800 mx-auto" id="documention" >
   <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
     {/* Left Side (Same) */}
     <div>
@@ -122,7 +122,7 @@ const { data: session, status } = useSession();
     </div>
 
     {/* Right Side (3-Step Boxes) */}
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       {/* Step 1 */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 1: Install the SDK</h3>
@@ -164,7 +164,7 @@ app.use(Logger.middleware());`}
 
 
       {/* Dashboard Preview */}
-      <section className="container py-20 border-t border-zinc-800">
+      <section className="container py-20 border-t border-zinc-800 mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">Powerful Dashboard</h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
@@ -186,7 +186,7 @@ app.use(Logger.middleware());`}
      <Pricing/>
 
       {/* CTA Section */}
-      <section className="container py-20 border-t border-zinc-800">
+      <section className="container py-20 border-t border-zinc-800 mx-auto">
         <div className="rounded-2xl bg-gradient-to-r from-emerald-900/20 to-blue-900/20 p-8 md:p-12 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to start monitoring?</h2>
           <p className="text-zinc-400 max-w-2xl mx-auto mb-8">

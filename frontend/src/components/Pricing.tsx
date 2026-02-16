@@ -25,7 +25,7 @@ return(
 <>
 
  {/* Pricing Section */}
-      <section id="pricing" className="container py-20 border-t border-zinc-800">
+      <section id="pricing" className="container py-20 border-t border-zinc-800 mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">Choose the plan that's right for your business</p>
