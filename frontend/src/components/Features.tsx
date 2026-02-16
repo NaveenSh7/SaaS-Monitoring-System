@@ -19,7 +19,7 @@ export default function Features (){
 return(
 <>
         {/* Features Section */}
-      <section id="features" className="container py-20 border-t border-zinc-800">
+      <section id="features" className="container py-20 border-t border-zinc-800 mx-auto">
         <div className="text-center mb-16 ">
           <h2 className="text-3xl font-bold mb-4">Comprehensive Monitoring Features</h2>
           <p className="text-zinc-400 max-w-2xl mx-auto">
