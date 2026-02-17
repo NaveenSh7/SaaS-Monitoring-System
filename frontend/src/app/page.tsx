@@ -97,68 +97,51 @@ const { data: session, status } = useSession();
       {/* Features Section */}
     <Features/>
 {/* Integration Section */}
-<section className="container py-20 border-t border-zinc-800 mx-auto" id="documention" >
-  <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
-    {/* Left Side (Same) */}
-    <div>
-      <h2 className="text-3xl font-bold mb-4">Simple Integration</h2>
-      <p className="text-zinc-400 mb-6">
-        Add our SDK to your application in minutes. Start monitoring with just a few lines of code.
-      </p>
-      <div className="space-y-4 text-white">
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <span>Works with React.Js and Next.Js</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <span>Zero performance impact</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          <span>Automatic error tracking</span>
-        </div>
+<section
+  className="container py-24 border-t border-zinc-800 mx-auto text-center"
+  id="documentation"
+>
+  <div className="max-w-3xl mx-auto">
+    {/* Heading */}
+    <h2 className="text-4xl font-bold mb-6">
+      Simple Integration
+    </h2>
+
+    {/* Subtext */}
+    <p className="text-zinc-400 text-lg mb-10">
+      Add our SDK to your application in minutes. 
+      Start monitoring with just a few lines of code.
+    </p>
+
+    {/* Points */}
+    <div className="flex flex-col items-center gap-5 mb-12 text-white">
+      <div className="flex items-center gap-3">
+        <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+        <span className="text-lg">Works with React.js and Next.js</span>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+        <span className="text-lg">Zero performance impact</span>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <CheckCircle2 className="h-6 w-6 text-emerald-500" />
+        <span className="text-lg">Automatic error tracking</span>
       </div>
     </div>
 
-    {/* Right Side (3-Step Boxes) */}
-    <div className="space-y-6 min-w-0">
-      {/* Step 1 */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 1: Install the SDK</h3>
-        <pre className="text-sm bg-zinc-950 p-3 rounded-md overflow-x-auto">
-          <code className="language-bash text-zinc-100">
-{`npm i saas-monitering-sdk`}
-          </code>
-        </pre>
-      </div>
-
-      {/* Step 2 */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 2: Get your API key</h3>
-        <p className="text-zinc-400 text-sm">
-          Retrieve the <span className="text-white font-medium">api_key</span> for your corresponding service from your SaaS Monitoring Dashboard.
-        </p>
-      </div>
-
-      {/* Step 3 */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 overflow-hidden">
-        <h3 className="text-lg font-semibold mb-2 text-emerald-500">Step 3: Add this code to your entry server's point</h3>
-        <pre className="text-sm bg-zinc-950 p-3 rounded-md overflow-x-auto">
-          <code className="language-javascript text-zinc-100">
-{`// SaaS Monitoring for Node
-app.set('trust proxy', true);
-const Logger = require('saas-monitering-sdk');
-
-Logger.init({
-  api_key: 'your_api_key',
-});
-
-app.use(Logger.middleware());`}
-          </code>
-        </pre>
-      </div>
-    </div>
+    {/* CTA Button */}
+    <a
+      href="/documentation"
+      className="inline-flex items-center justify-center px-12 py-5 text-lg font-semibold rounded-2xl
+                 bg-emerald-600 hover:bg-emerald-500 
+                 transition-all duration-300 
+                 text-black shadow-xl hover:shadow-emerald-500/40
+                 hover:-translate-y-1"
+    >
+      View Documentation →
+    </a>
   </div>
 </section>
 

@@ -1,4 +1,4 @@
-
+"use client";
 import { Button } from "@/components/ui/button"
 import { signIn, signOut, useSession} from "next-auth/react";
 import { useState } from "react";
@@ -28,7 +28,7 @@ return(
         <div className="mx-auto flex h-16 w-full max-w-screen-2xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-emerald-500" />
-            <Link href="/#hero" className="text-xl font-bold">Saas-Monitor</Link>
+            <Link href="/#hero" className="text-xl font-bold text-white">Saas-Monitor</Link>
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/#features" className="text-sm font-medium text-zinc-400 hover:text-white">
@@ -37,7 +37,7 @@ return(
             <Link href="/#pricing" className="text-sm font-medium text-zinc-400 hover:text-white">
               Pricing
             </Link>
-            <Link href="/#documention" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link href="/documentation" className="text-sm font-medium text-zinc-400 hover:text-white">
               Documentation
             </Link>
 
