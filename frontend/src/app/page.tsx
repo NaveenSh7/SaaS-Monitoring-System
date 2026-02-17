@@ -66,17 +66,16 @@ const { data: session, status } = useSession();
                  Start Monitoring
             <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-            </Link>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white cursor-pointer"
-                  onClick={() => {
-                       document.getElementById('documention')?.scrollIntoView({ behavior: 'smooth' });
-                 }} 
-              >
-                View Documentation
-              </Button>
+            </Link >
+
+              <Link href="/documentation">
+                <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-zinc-800 text-zinc-400 hover:bg-zinc-900 hover:text-white cursor-pointer"
+                       >    View Documentation</Button>
+     
+              </Link>
             </div>
           </div>
           <div className="relative flex items-center justify-center">

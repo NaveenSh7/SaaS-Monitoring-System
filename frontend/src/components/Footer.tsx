@@ -23,7 +23,7 @@ return(
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Activity className="h-6 w-6 text-emerald-500" />
-                <span className="text-xl font-bold">APIMonitor</span>
+                <span className="text-xl font-bold">Saas-Moniter</span>
               </div>
               <p className="text-zinc-400 text-sm">Comprehensive API and service monitoring for modern applications.</p>
             </div>
@@ -99,7 +99,7 @@ return(
             </div>
           </div>
           <div className="border-t border-zinc-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-zinc-400 text-sm">© {new Date().getFullYear()} APIMonitor. All rights reserved.</p>
+            <p className="text-zinc-400 text-sm">© {new Date().getFullYear()} Saas-Moniter. All rights reserved.</p>
             <div className="flex gap-4 mt-4 md:mt-0">
               <Link href="#" className="text-zinc-400 hover:text-white">
                 <Shield className="h-5 w-5" />

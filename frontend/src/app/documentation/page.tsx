@@ -2,13 +2,20 @@
 
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
+import { SiNodedotjs, SiFastapi } from 'react-icons/si'
 import Navbar from '@/components/Navbar'
+
 type Service = 'node-express' | 'fastapi'
 
 const services = {
   'node-express': {
     name: 'Node.js & Express',
-    icon: '',
+    icon: (
+      <span className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <SiNodedotjs className="text-emerald-400 text-lg" />
+      </span>
+    ),
+    status: 'ready',
     steps: [
       {
         title: 'Step 1: Install the SDK',
@@ -17,15 +24,16 @@ const services = {
       },
       {
         title: 'Step 2: Get your API key',
-        description: 'Retrieve the api_key for your corresponding service from your SaaS Monitoring Dashboard.',
+        description:
+          'Retrieve the api_key for your corresponding service from your SaaS Monitoring Dashboard.',
         code: '',
       },
       {
-        title: 'Step 3: Add this code to your entry server\'s point',
+        title: "Step 3: Add this code to your entry server's point",
         description: 'Initialize the logger with your API key',
         code: `// SaaS Monitoring for Node
 app.set('trust proxy', true);
-const Logger = require('saas-monitering-sdk');
+const Logger = require('saas-monitoring-sdk');
 
 Logger.init({
   api_key: 'your_api_key',
@@ -35,21 +43,27 @@ app.use(Logger.middleware());`,
       },
     ],
   },
-  'fastapi': {
+
+  fastapi: {
     name: 'FastAPI',
-    icon: '',
-    steps: [
-      {
-        title: 'Coming Soon',
-        description: 'FastAPI integration is currently under development. We\'ll have support ready for you very soon!',
-        code: '',
-      },
-    ],
+    icon: (
+      <span className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <SiFastapi className="text-emerald-400 text-lg" />
+      </span>
+    ),
+    status: 'coming-soon',
+    comingSoonTitle: 'FastAPI Support Coming Soon',
+    comingSoonDescription:
+      "We're actively building FastAPI integration. It will be available very soon with full middleware and performance tracking support.",
+    steps: [],
   },
 }
 
+
+
 export default function DocsPage() {
-  const [selectedService, setSelectedService] = useState<Service>('node-express')
+  const [selectedService, setSelectedService] =
+    useState<Service>('node-express')
   const [copiedCode, setCopiedCode] = useState<number | null>(null)
 
   const copyToClipboard = (code: string, stepIndex: number) => {
@@ -61,83 +75,96 @@ export default function DocsPage() {
   const currentService = services[selectedService]
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Main Content */}
-        <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black">
+      <Navbar />
+
+      <main className="max-w-6xl mx-auto px-6 py-20">
         {/* Page Title */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-white mb-2">Documentation</h1>
-          <p className="text-emerald-200/60">Get started with SaaS Monitoring by integrating our SDK into your application.</p>
+        <div className="mb-16">
+          <h1 className="text-5xl font-bold text-white mb-3 tracking-tight">
+            Documentation
+          </h1>
+          <p className="text-zinc-400 text-lg">
+            Get started by integrating our SDK into your application.
+          </p>
         </div>
 
         {/* Service Selector */}
-        <div className="mb-12 flex gap-4 flex-wrap">
-          {(Object.entries(services) as [Service, typeof services[Service]][]).map(([key, service]) => (
+        <div className="mb-14 flex gap-4 flex-wrap">
+          {(Object.entries(services) as [
+            Service,
+            typeof services[Service]
+          ][]).map(([key, service]) => (
             <button
               key={key}
               onClick={() => setSelectedService(key)}
-              className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 ${
+              className={`px-6 py-3 rounded-xl font-semibold transition flex items-center gap-3 border ${
                 selectedService === key
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-emerald-950/20 border border-emerald-600/30 text-emerald-400 hover:border-emerald-600/50'
+                  ? 'bg-emerald-700 text-white border-emerald-600 shadow-lg shadow-emerald-600/20'
+                  : 'bg-zinc-900/40 border-emerald-600/20 text-emerald-400 hover:border-emerald-600/50'
               }`}
             >
-              <span>{service.icon}</span>
+              {service.icon}
               {service.name}
             </button>
           ))}
         </div>
 
-        {/* Content */}
-        {selectedService === 'node-express' && (
-          <div className="space-y-8">
-            {currentService.steps.map((step, index) => (
-              <div key={index} className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-8 backdrop-blur">
-                <h2 className="text-2xl font-bold text-emerald-600 mb-2">{step.title}</h2>
-                <p className="text-white mb-6">{step.description}</p>
+      {/* Content */}
+{currentService.status === 'ready' ? (
+  <div className="space-y-10">
+    {currentService.steps.map((step, index) => (
+      <div
+        key={index}
+        className="bg-zinc-900/60 border border-emerald-500/20 rounded-2xl p-8 backdrop-blur-md shadow-lg"
+      >
+        <h2 className="text-2xl font-bold text-emerald-500 mb-3">
+          {step.title}
+        </h2>
 
-                {step.code && (
-                  <div className="relative">
-                    <div className="bg-black border border-emerald-600/20 rounded-lg p-4 font-mono text-sm overflow-x-auto">
-                     <code className="text-white whitespace-pre-wrap">
-  {step.code}
-</code>
-
-                    </div>
-                    <button
-  onClick={() => copyToClipboard(step.code, index)}
-  className="absolute top-1 right-1 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-600/30 text-white px-3 py-1.5 rounded-md transition flex items-center gap-2 backdrop-blur-sm"
->
-
-                      {copiedCode === index ? (
-                        <>
-                          <Check className="w-3 h-4" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          Copy
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+        {step.description && (
+          <p className="text-zinc-300 mb-6">{step.description}</p>
         )}
 
-        {selectedService === 'fastapi' && (
-          <div className="bg-emerald-950/20 border border-emerald-600/30 rounded-xl p-12 backdrop-blur text-center">
-            <div className="text-6xl mb-4">🚀</div>
-            <h2 className="text-3xl font-bold text-white mb-4">Coming Soon</h2>
-            <p className="text-white text-lg max-w-2xl mx-auto">
-              We're working hard to bring FastAPI support to SaaS Monitoring. Check back soon for updates! In the meantime, explore our Node.js & Express integration.
-            </p>
+        {step.code && (
+          <div className="relative">
+            <div className="bg-zinc-950 border border-emerald-600/20 rounded-xl pt-12 px-4 pb-4 font-mono text-sm overflow-x-auto whitespace-pre">
+              <code className="text-white">{step.code}</code>
+            </div>
+
+            <button
+              onClick={() => copyToClipboard(step.code, index)}
+              className="absolute top-3 right-3 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-md transition flex items-center gap-2 text-xs"
+            >
+              {copiedCode === index ? (
+                <>
+                  <Check className="w-3 h-3" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3 h-3" />
+                  Copy
+                </>
+              )}
+            </button>
           </div>
         )}
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="bg-zinc-900/60 border border-emerald-500/20 rounded-2xl p-16 backdrop-blur-md shadow-lg text-center">
+    <div className="text-6xl mb-6">🚀</div>
+    <h2 className="text-3xl font-bold text-white mb-4">
+      {('comingSoonTitle' in currentService) && currentService.comingSoonTitle}
+    </h2>
+    <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+      {('comingSoonDescription' in currentService) && currentService.comingSoonDescription}
+    </p>
+  </div>
+)}
+
       </main>
     </div>
   )
