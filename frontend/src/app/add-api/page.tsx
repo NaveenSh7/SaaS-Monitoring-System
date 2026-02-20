@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Loader from "@/components/Loader"
+import LimitPopup from "@/components/LimitPopup"
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export default function AddAPI() {
@@ -28,6 +29,8 @@ export default function AddAPI() {
   const [apiUrlError, setApiUrlError] = useState("")
   const [apiTypeError, setApiTypeError] = useState("")
   const [planError, setPlanError] = useState("")
+  const [showLimitPopup, setShowLimitPopup] = useState(false);
+  const [limitMessage, setLimitMessage] = useState("");
   // Pre-written SDK integration code
   const sdkIntegrationCode = `// SaaS Monitoring for Node
 app.set('trust proxy', true);
@@ -130,9 +133,19 @@ app.use(Logger.middleware());`
       } else {
         console.error("Failed to create API:", response.statusText)
       }
-    } catch (error) {
-      console.error("Error creating API:", error)
+    } catch (error: any) {
         setLoading(false)
+        if (error.response?.status === 403) {
+        setLimitMessage(
+          "You have reached your service limit. Upgrade your plan to add more services.",
+        );
+        setShowLimitPopup(true);
+        return;
+      }
+      console.error("Error creating API:", error);
+    } finally {
+      setLoading(false);
+    
     }
   }
 
@@ -437,8 +450,17 @@ if(loading)
               Add API
             </Button>
           </div>
-        </form>
+        </form>  
       </div>
+      <LimitPopup
+        open={showLimitPopup}
+        message={limitMessage}
+        onClose={() => setShowLimitPopup(false)}
+        onUpgrade={() => {
+          setShowLimitPopup(false);
+          router.push("/payment");
+        }}
+        />
     </div>
   )
 }
