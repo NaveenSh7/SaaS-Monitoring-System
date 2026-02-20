@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
-import { SiNodedotjs, SiFastapi } from 'react-icons/si'
+import { SiNodedotjs, SiFastapi,SiSpringboot,SiDjango,SiFlask } from 'react-icons/si'
 import Navbar from '@/components/Navbar'
 
-type Service = 'node-express' | 'fastapi'
+type Service = 'node-express' | 'springboot' | 'django' | 'fastapi' | 'flask'
 
 const services = {
   'node-express': {
@@ -43,6 +43,33 @@ app.use(Logger.middleware());`,
       },
     ],
   },
+  springboot: {
+    name: 'Spring Boot',
+    icon: (
+      <span className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <SiSpringboot className="text-emerald-400 text-lg" />
+      </span>
+    ),
+    status: 'coming-soon',
+    comingSoonTitle: 'Spring Boot Support Coming Soon',
+    comingSoonDescription:
+      "We're actively building Spring Boot integration. It will be available very soon with full middleware and performance tracking support.",
+    steps: [],
+  },
+
+  django: {
+    name: 'Django',
+    icon: (
+      <span className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <SiDjango className="text-emerald-400 text-lg" />
+      </span>
+    ),
+    status: 'coming-soon',
+    comingSoonTitle: 'Django Support Coming Soon',
+    comingSoonDescription:
+      "We're actively building Django integration. It will be available very soon with full middleware and performance tracking support.",
+    steps: [],
+  },
 
   fastapi: {
     name: 'FastAPI',
@@ -55,6 +82,20 @@ app.use(Logger.middleware());`,
     comingSoonTitle: 'FastAPI Support Coming Soon',
     comingSoonDescription:
       "We're actively building FastAPI integration. It will be available very soon with full middleware and performance tracking support.",
+    steps: [],
+  },
+
+  flask: {
+    name: 'Flask',
+    icon: (
+      <span className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+        <SiFlask className="text-emerald-400 text-lg" />
+      </span>
+    ),
+    status: 'coming-soon',
+    comingSoonTitle: 'Flask Support Coming Soon',
+    comingSoonDescription:
+      "We're actively building Flask integration. It will be available very soon with full middleware and performance tracking support.",
     steps: [],
   },
 }
