@@ -92,13 +92,18 @@ export default function Payment  (){
         amount: orderData.data.amount,
         user_email: session?.user?.email, 
       });
-      // Show success state and redirect after a short delay
-      setPaymentSuccess(true);
-      setTimeout(() => {
-        router.push("/");
-      }, 3000);
+      if (resp.data?.success) {
+        // Show success state and redirect after a short delay
+        setPaymentSuccess(true);
+        setTimeout(() => {
+          router.push("/");
+        }, 3000);
+      } else {
+        alert(resp.data?.message || "Payment verification failed. Please contact support.");
+      }
     } catch (error) {
       console.error("Error storing payment:", error);
+      alert("Payment verification failed. Please try again or contact support.");
     }
       },
       prefill: {
