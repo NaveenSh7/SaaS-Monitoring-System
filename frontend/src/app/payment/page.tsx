@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { signIn, signOut, useSession } from "next-auth/react";
 import {
-
   CheckCircle2,
-
+  ShieldCheck,
 } from "lucide-react"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -23,7 +23,34 @@ declare global {
 
 export default function Payment  (){
  const [amount, setAmount] = useState(499);
-const { data: session } = useSession()
+ const [paymentSuccess, setPaymentSuccess] = useState(false);
+ const [isProUser, setIsProUser] = useState(false);
+ const [checkingPlan, setCheckingPlan] = useState(true);
+ const { data: session } = useSession();
+ const router = useRouter();
+
+  // Check if user is already on the pro plan
+  useEffect(() => {
+    const checkUserPlan = async () => {
+      if (!session?.user?.email) {
+        setCheckingPlan(false);
+        return;
+      }
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/users`, {
+          params: { email: session.user.email },
+        });
+        if (res.data?.plan === "pro") {
+          setIsProUser(true);
+        }
+      } catch (err) {
+        console.error("Error checking user plan:", err);
+      } finally {
+        setCheckingPlan(false);
+      }
+    };
+    checkUserPlan();
+  }, [session?.user?.email]);
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -55,8 +82,6 @@ const { data: session } = useSession()
       description: "Test Transaction",
       order_id: orderData.data.id,
       handler: async function  (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string; }) {
-  
-        alert("Payment Successful! ID: " + response.razorpay_payment_id);
 
             // Call backend to store payment in DB
     try {
@@ -67,8 +92,18 @@ const { data: session } = useSession()
         amount: orderData.data.amount,
         user_email: session?.user?.email, 
       });
+      if (resp.data?.success) {
+        // Show success state and redirect after a short delay
+        setPaymentSuccess(true);
+        setTimeout(() => {
+          router.push("/");
+        }, 3000);
+      } else {
+        alert(resp.data?.message || "Payment verification failed. Please contact support.");
+      }
     } catch (error) {
       console.error("Error storing payment:", error);
+      alert("Payment verification failed. Please try again or contact support.");
     }
       },
       prefill: {
@@ -91,8 +126,57 @@ const { data: session } = useSession()
     <>
     <div> Please login</div>
     </>)
-
   }
+
+  if (checkingPlan) {
+    return (
+      <div className="flex justify-center items-center bg-black h-screen w-screen">
+        <p className="text-white text-lg">Loading...</p>
+      </div>
+    );
+  }
+
+  // User is already on the pro plan
+  if (isProUser) {
+    return (
+      <div className="flex justify-center items-center bg-black h-screen w-screen">
+        <Card className="bg-zinc-900 border-emerald-600 w-1/2">
+          <CardContent className="p-10 text-white flex flex-col items-center text-center gap-4">
+            <ShieldCheck className="h-16 w-16 text-emerald-500" />
+            <h2 className="text-2xl font-bold">You already have an active Subscription</h2>
+            <p className="text-zinc-400">
+              You&apos;re on the <span className="text-emerald-400 font-semibold">Developer (Pro)</span> plan. Enjoy all premium features!
+            </p>
+            <Button
+              onClick={() => router.push("/")}
+              className="mt-4 bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
+            >
+              Go to Homepage
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Payment was just completed successfully
+  if (paymentSuccess) {
+    return (
+      <div className="flex justify-center items-center bg-black h-screen w-screen">
+        <Card className="bg-zinc-900 border-emerald-600 w-1/2">
+          <CardContent className="p-10 text-white flex flex-col items-center text-center gap-4">
+            <CheckCircle2 className="h-16 w-16 text-emerald-500" />
+            <h2 className="text-2xl font-bold">Your Payment is Successful!</h2>
+            <p className="text-zinc-400">
+              You have been upgraded to the <span className="text-emerald-400 font-semibold">Developer (Pro)</span> plan.
+            </p>
+            <p className="text-zinc-500 text-sm">Redirecting to homepage...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
     return(
     <>
     <div className="flex justify-center items-center bg-black h-screen w-screen">
