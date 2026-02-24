@@ -125,12 +125,12 @@ export default function Dashboard() {
       try {
         const userEmail = session.user.email;
         const userRes = await fetch(
-          `${BACKEND_URL}/api/users?email=${userEmail}`,
+          `${BACKEND_URL}/api/users?email=${userEmail}`
         );
         if (!userRes.ok) {
           const errText = await userRes.text();
           throw new Error(
-            `Failed to fetch user: ${userRes.status} ${userRes.statusText} ${errText}`,
+            `Failed to fetch user: ${userRes.status} ${userRes.statusText} ${errText}`
           );
         }
 
@@ -138,7 +138,7 @@ export default function Dashboard() {
         const userId = userData.id;
 
         const response = await fetch(
-          `${BACKEND_URL}/api/apis?user_id=${userId}`,
+          `${BACKEND_URL}/api/apis?user_id=${userId}`
         );
         if (response.ok) {
           const data = await response.json();
@@ -167,7 +167,7 @@ export default function Dashboard() {
 
       try {
         const response = await fetch(
-          `${BACKEND_URL}/api/uptime?api_id=${selectedAPI}`,
+          `${BACKEND_URL}/api/uptime?api_id=${selectedAPI}`
         );
         const data = await response.json();
         setUptimes(data);
@@ -186,7 +186,7 @@ export default function Dashboard() {
 
       try {
         const response = await fetch(
-          `${BACKEND_URL}/api/dashboard?api_id=${selectedAPI}`,
+          `${BACKEND_URL}/api/dashboard?api_id=${selectedAPI}`
         );
         const data = await response.json();
 
@@ -251,16 +251,75 @@ export default function Dashboard() {
     }
   };
 
-  const deteleApi = (selectedAPIData: any) => {
+  // const deteleApi = (selectedAPIData: any) => {
+  //   let confirmDelete = confirm(
+  //     `Are you sure you want to delete "${selectedAPIData.name}"?`,
+  //   );
+  //   if (!confirmDelete) return;
+  //   if (!confirmDelete) return;
+  //   confirmDelete = confirm(
+  //     `You will loose all the monitering data are you sure?`,
+  //   );
+  //   if (!confirmDelete) return;
+  // };
+  const deteleApi = async (selectedAPIData: any) => {
     let confirmDelete = confirm(
-      `Are you sure you want to delete "${selectedAPIData.name}"?`,
+      `Are you sure you want to delete "${selectedAPIData.name}"?`
     );
     if (!confirmDelete) return;
-    if (!confirmDelete) return;
+
     confirmDelete = confirm(
-      `You will loose all the monitering data are you sure?`,
+      `You will loose all the monitering data are you sure?`
     );
     if (!confirmDelete) return;
+
+    if (!BACKEND_URL) {
+      alert("Backend URL is not configured.");
+      return;
+    }
+    if (!session?.user?.email) {
+      alert("You must be logged in.");
+      return;
+    }
+
+    try {
+      const userRes = await fetch(
+        `${BACKEND_URL}/api/users?email=${session.user.email}`
+      );
+      if (!userRes.ok) {
+        throw new Error("Failed to fetch user");
+      }
+      const userData = await userRes.json();
+      const userId = userData.id;
+
+      const res = await fetch(`${BACKEND_URL}/api/apis`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          api_id: selectedAPIData.id,
+          user_id: userId,
+        }),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Failed to delete API: ${res.status} ${txt}`);
+      }
+
+      const newApis = apis.filter((api) => api.id !== selectedAPIData.id);
+      setApis(newApis);
+
+      if (selectedAPI === selectedAPIData.id) {
+        setSelectedAPI(newApis[0]?.id ?? null);
+      }
+
+      alert("Service deleted successfully.");
+    } catch (err) {
+      console.error("Error deleting API:", err);
+      alert("Error deleting service. Check console for details.");
+    }
   };
 
   if (loading) {
@@ -355,10 +414,10 @@ export default function Dashboard() {
                   cardStatus === "healthy"
                     ? "border-emerald-600 bg-emerald-900/10"
                     : cardStatus === "warning"
-                      ? "border-yellow-600 bg-yellow-900/10"
-                      : cardStatus === "error"
-                        ? "border-red-600 bg-red-900/10"
-                        : "border-zinc-700 bg-zinc-900/10";
+                    ? "border-yellow-600 bg-yellow-900/10"
+                    : cardStatus === "error"
+                    ? "border-red-600 bg-red-900/10"
+                    : "border-zinc-700 bg-zinc-900/10";
                 return (
                   <Card
                     key={api.id}
@@ -372,7 +431,9 @@ export default function Dashboard() {
                     <CardContent className="p-4 text-white">
                       <div className="flex items-start justify-between mb-2">
                         <div
-                          className={`w-3 h-3 rounded-full ${getStatusColor(cardStatus)}`}
+                          className={`w-3 h-3 rounded-full ${getStatusColor(
+                            cardStatus
+                          )}`}
                         />
                         {getStatusBadge(cardStatus)}
                       </div>
@@ -396,7 +457,9 @@ export default function Dashboard() {
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-4 h-4 rounded-full ${getStatusColor(getHealthStatus())}`}
+                  className={`w-4 h-4 rounded-full ${getStatusColor(
+                    getHealthStatus()
+                  )}`}
                 />
                 <h3 className="text-xl md:text-2xl font-bold">
                   {selectedAPIData.name}

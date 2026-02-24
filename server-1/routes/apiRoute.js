@@ -1,17 +1,23 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { getAllApis, createApi, getApi, updateApi, getApiCount } = require('../models/apiModel');
-const crypto = require('crypto');
-const { updateUserServiceCount } = require('../models/userModel');
+const {
+  getAllApis,
+  createApi,
+  getApi,
+  updateApi,
+  getApiCount,
+  deleteApi,
+} = require("../models/apiModel");
+const crypto = require("crypto");
+const { updateUserServiceCount } = require("../models/userModel");
 
 // GET all apis
-router.get('/all', async (req, res) => {
-
+router.get("/all", async (req, res) => {
   try {
     const users = await getAllApis();
     res.json(users);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching apis' });
+    res.status(500).json({ message: "Error fetching apis" });
   }
 });
 
@@ -19,47 +25,50 @@ router.get('/all', async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { user_id, name, url, api_type, plan } = req.body
+    const { user_id, name, url, api_type, plan } = req.body;
 
-    const api_key = crypto.randomBytes(20)
-      .toString('base64')       // Convert to base64
-      .replace(/[^a-zA-Z0-9]/g, '') // Remove non-alphanumeric
-      .slice(0, 20);        // Trim to required length - 20
-    console.log(api_key)
+    const api_key = crypto
+      .randomBytes(20)
+      .toString("base64") // Convert to base64
+      .replace(/[^a-zA-Z0-9]/g, "") // Remove non-alphanumeric
+      .slice(0, 20); // Trim to required length - 20
+    console.log(api_key);
 
     // Validate required fields
     if (!user_id || !name || !url || !api_type || !plan) {
       return res.status(400).json({
         error: "Missing required fields: user_id, name, url, api_type, plan",
-      })
+      });
     }
 
     // Validate api_type
     if (!["server", "serverless"].includes(api_type)) {
       return res.status(400).json({
         error: 'api_type must be either "server" or "serverless"',
-      })
+      });
     }
 
     // Validate plan
     if (!["free", "pro"].includes(plan)) {
       return res.status(400).json({
         error: 'plan must be either "free" or "pro"',
-      })
+      });
     }
 
     const PLAN_LIMITS = {
       free: 2,
-      pro: 5
+      pro: 5,
     };
 
     const currentCount = await getApiCount(user_id);
 
     if (currentCount >= PLAN_LIMITS[plan]) {
       return res.status(403).json({
-        error: `Plan limit reached. ${plan.toUpperCase()} plan allows only ${PLAN_LIMITS[plan]} services.`,
+        error: `Plan limit reached. ${plan.toUpperCase()} plan allows only ${
+          PLAN_LIMITS[plan]
+        } services.`,
         current_count: currentCount,
-        limit: PLAN_LIMITS[plan]
+        limit: PLAN_LIMITS[plan],
       });
     }
     const newApi = await createApi({
@@ -68,8 +77,8 @@ router.post("/", async (req, res) => {
       url,
       api_type,
       plan,
-      api_key
-    })
+      api_key,
+    });
 
     // const updatedCount = await getApiCount(user_id);
 
@@ -77,12 +86,12 @@ router.post("/", async (req, res) => {
     res.status(201).json({
       message: "API created successfully",
       api: newApi,
-    })
+    });
   } catch (error) {
-    console.error("Error creating API:", error)
-    res.status(500).json({ error: "Failed to create API" })
+    console.error("Error creating API:", error);
+    res.status(500).json({ error: "Failed to create API" });
   }
-})
+});
 
 // router.post('/' , async (req,res)=>{
 
@@ -102,32 +111,51 @@ router.post("/", async (req, res) => {
 // })
 
 // Get a api by query :user_id
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-
     const { user_id } = req.query;
 
     const result = await getApi(user_id);
 
     res.json(result);
-
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching api' });
+    res.status(500).json({ message: "Error fetching api" });
   }
-})
+});
 
-router.put('/', async (req, res) => {
+router.put("/", async (req, res) => {
   try {
     const { api_id, name, url } = req.body;
     const result = await updateApi(api_id, name, url);
     res.json(result);
-
   } catch (error) {
-    res.status(500).json({ message: 'Error updating api' });
-    console.log(error)
+    res.status(500).json({ message: "Error updating api" });
+    console.log(error);
   }
-})
+});
+router.delete("/", async (req, res) => {
+  try {
+    const { api_id, user_id } = req.body;
 
+    if (!api_id || !user_id) {
+      return res
+        .status(400)
+        .json({ message: "api_id and user_id are required" });
+    }
 
+    const deleted = await deleteApi(api_id, user_id);
+
+    if (!deleted) {
+      return res
+        .status(404)
+        .json({ message: "API not found or not owned by user" });
+    }
+
+    res.json({ message: "API deleted successfully", api: deleted });
+  } catch (error) {
+    console.error("Error deleting api:", error);
+    res.status(500).json({ message: "Error deleting api" });
+  }
+});
 
 module.exports = router;
