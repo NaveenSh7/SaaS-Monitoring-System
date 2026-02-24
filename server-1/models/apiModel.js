@@ -1,8 +1,8 @@
-const db = require('../db');
-const moment = require('moment-timezone');
+const db = require("../db");
+const moment = require("moment-timezone");
 
 const getAllApis = async () => {
-  const result = await db.query('SELECT * FROM apis');
+  const result = await db.query("SELECT * FROM apis");
 
   return result.rows;
 };
@@ -19,7 +19,7 @@ const getAllApis = async () => {
 // Create new API and insert initial uptime entry
 const createApi = async (apiData) => {
   try {
-    const { user_id, name, url, api_type, plan, api_key } = apiData
+    const { user_id, name, url, api_type, plan, api_key } = apiData;
 
     // 1. Insert into apis table
     const result = await db.query(
@@ -27,9 +27,9 @@ const createApi = async (apiData) => {
        VALUES ($1, $2, $3, $4, $5,$6) 
        RETURNING *`,
       [user_id, name, url, api_type, plan, api_key]
-    )
+    );
 
-    const newApi = result.rows[0]
+    const newApi = result.rows[0];
 
     // 2. Immediately insert into uptimes table
     // const started_at =  moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss');
@@ -37,39 +37,45 @@ const createApi = async (apiData) => {
       `INSERT INTO uptimes (api_id )
        VALUES ($1 )`,
       [newApi.id]
-    )
+    );
 
-    return newApi
+    return newApi;
   } catch (error) {
-    console.error("Error in createApi:", error)
-    throw error
+    console.error("Error in createApi:", error);
+    throw error;
   }
-}
-
+};
 
 const getApi = async (user_id) => {
-
-  const result = await db.query(
-    'SELECT * FROM apis WHERE user_id = $1', [user_id]
-  );
+  const result = await db.query("SELECT * FROM apis WHERE user_id = $1", [
+    user_id,
+  ]);
 
   return result.rows;
-
-}
+};
 const updateApi = async (api_id, name, url) => {
-
   const result = await db.query(
-    'UPDATE apis SET name = $1, url = $2 WHERE id = $3 RETURNING *', [name, url, api_id]
+    "UPDATE apis SET name = $1, url = $2 WHERE id = $3 RETURNING *",
+    [name, url, api_id]
   );
   return result.rows[0];
-}
+};
 
 const getApiCount = async (user_id) => {
   const result = await db.query(
-    'SELECT COUNT(*) FROM apis WHERE user_id = $1',
+    "SELECT COUNT(*) FROM apis WHERE user_id = $1",
     [user_id]
   );
   return parseInt(result.rows[0].count, 10);
+};
+
+const deleteApi = async (api_id, user_id) => {
+  const result = await db.query(
+    "DELETE FROM apis WHERE id = $1 AND user_id = $2 RETURNING *",
+    [api_id, user_id]
+  );
+
+  return result.rows[0];
 };
 
 module.exports = {
@@ -77,7 +83,6 @@ module.exports = {
   getApi,
   createApi,
   updateApi,
-  getApiCount
+  getApiCount,
+  deleteApi,
 };
-
-
