@@ -1,88 +1,105 @@
 "use client";
-import { Button } from "@/components/ui/button"
-import { signIn, signOut, useSession} from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useState } from "react";
-import Link from "next/link"
-import Loader from "@/components/Loader"
- 
+import Link from "next/link";
+import Loader from "@/components/Loader";
 
-import {
-  Activity,
-} from "lucide-react"
+import { Activity } from "lucide-react";
 
-export default function Navbar (){
-    const { data: session } = useSession();
- const [loading, setLoading] = useState(false)
+export default function Navbar() {
+  const { data: session } = useSession();
+  const [loading, setLoading] = useState(false);
 
-  if(loading)
-    {
-      return(
-       <div >
-        <Loader/>
-        </div> )
-    }
-return(
-<>
- {/* Navbar */}
+  if (loading) {
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
+  }
+  return (
+    <>
+      {/* Navbar */}
       <header className="sticky top-0 z-40 w-full border-b border-zinc-800 bg-black/95 backdrop-blur supports-[backdrop-filter]:bg-black/60">
         <div className="mx-auto flex h-16 w-full max-w-screen-2xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-emerald-500" />
-            <Link href="/#hero" className="text-xl font-bold text-white">Saas-Monitor</Link>
+            <Link href="/#hero" className="text-xl font-bold text-white">
+              Saas-Monitor
+            </Link>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link
+              href="/#features"
+              className="text-sm font-medium text-zinc-400 hover:text-white"
+            >
               Features
             </Link>
-            <Link href="/#pricing" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link
+              href="/#pricing"
+              className="text-sm font-medium text-zinc-400 hover:text-white"
+            >
               Pricing
             </Link>
-            <Link href="/documentation" className="text-sm font-medium text-zinc-400 hover:text-white">
+            <Link
+              href="/documentation"
+              className="text-sm font-medium text-zinc-400 hover:text-white"
+            >
               Documentation
             </Link>
-
           </nav>
-           
 
-          {session ?  (<>
-             <div className="flex items-center gap-x-4">
-    <Link
-      href="/dashboard"
-      className="text-sm font-medium px-2 py-1 hover:text-white cursor bg-emerald-600 hover:bg-emerald-700 border-0 rounded-sm"
-    >
-      Dashboard
-    </Link>
-    <Button
-      onClick={ async () => {
-       setLoading(true);
-        await signOut();
-        setLoading(false);
-      }}
-      className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white cursor-pointer "
-    >
-      Logout
-    </Button>
-  </div> </>) : (  <div className="flex items-center gap-4">
-            <Button 
-                onClick={ async ()=>{ 
+          {session ? (
+            <>
+              <div className="flex items-center gap-x-4">
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium px-2 py-1 hover:text-white cursor bg-emerald-600 hover:bg-emerald-700 border-0 rounded-sm"
+                >
+                  Dashboard
+                </Link>
+                <Button
+                  onClick={async () => {
+                    setLoading(true);
+                    await signOut({
+                      redirect: true,
+                      callbackUrl: "/",
+                    });
+                    setLoading(false);
+                  }}
+                  className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white cursor-pointer "
+                >
+                  Logout
+                </Button>
+              </div>{" "}
+            </>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={async () => {
                   setLoading(true);
-                await  signIn("google") 
-                setLoading(false);
-              } }
-                className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white cursor-pointer">
-              Login
-            </Button>
-            <Button 
-               onClick={ async ()=>{ 
+                  await signIn("google");
+                  setLoading(false);
+                }}
+                className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-white cursor-pointer"
+              >
+                Login
+              </Button>
+              <Button
+                onClick={async () => {
                   setLoading(true);
-                await  signIn("google") 
-                setLoading(false);
-              } }
-            className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer">Sign Up Free</Button>
-          </div>) }
-        
+                  await signIn("google");
+                  setLoading(false);
+                }}
+                className="bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
+              >
+                Sign Up Free
+              </Button>
+            </div>
+          )}
         </div>
       </header>
-</>
-)
+    </>
+  );
 }
