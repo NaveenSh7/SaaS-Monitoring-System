@@ -1,5 +1,5 @@
 "use client";
-
+import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -22,6 +22,8 @@ import Loader from "@/components/Loader";
 import EndpointChart from "@/components/charts/EndpointChart";
 import TrafficChart from "@/components/charts/TrafficChart";
 import InfoChart from "@/components/charts/InfoChart";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 interface ApiData {
@@ -92,19 +94,17 @@ export default function Dashboard() {
   const [uptimes, setUptimes] = useState<UptimeData | null>(null);
   const [dashboardData, setdashboardData] = useState<DashData | null>(null);
 
-  // if user is not authenticated redirect to login page
   useEffect(() => {
     if (status === "unauthenticated") {
       void signIn("google", { callbackUrl: "/dashboard" });
     }
   }, [status]);
 
-  // fetch uptime of a perticular api
-
   const selectedAPIData = apis.find((api) => api.id === selectedAPI);
+
   const exportData = dashboardData
     ? {
-        traffic: dashboardData.timestamps.map((t, i) => ({
+        traffic: (dashboardData.timestamps || []).map((t, i) => ({
           timestamp: t.timestamp,
         })),
         endpoints: dashboardData.endpoints || [],
@@ -143,16 +143,18 @@ export default function Dashboard() {
         if (response.ok) {
           const data = await response.json();
           setApis(data);
+        
 
-          // ✅ Set selected API separately and let another useEffect handle fetchUptimes
           if (data.length > 0 && !selectedAPI) {
             setSelectedAPI(data[0].id);
           }
         } else {
           console.error("Failed to fetch APIs");
+          toast.error("Failed to load APIs");
         }
       } catch (error) {
         console.error("Error fetching APIs:", error);
+        toast.error("Error connecting to backend");
       } finally {
         setLoading(false);
       }
@@ -164,38 +166,32 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUptimes = async () => {
       if (!selectedAPI) return;
-
       try {
         const response = await fetch(
           `${BACKEND_URL}/api/uptime?api_id=${selectedAPI}`
         );
         const data = await response.json();
         setUptimes(data);
-        // console.log(data)
       } catch (error) {
         console.error("Error fetching uptimes:", error);
       }
     };
-
     fetchUptimes();
   }, [selectedAPI]);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       if (!selectedAPI) return;
-
       try {
         const response = await fetch(
           `${BACKEND_URL}/api/dashboard?api_id=${selectedAPI}`
         );
         const data = await response.json();
-
         setdashboardData(data);
       } catch (error) {
-        console.error("Error fetching uptimes:", error);
+        console.error("Error fetching dashboard:", error);
       }
     };
-
     fetchDashboard();
   }, [selectedAPI]);
 
@@ -203,7 +199,6 @@ export default function Dashboard() {
     if (!uptimes?.status?.status) return "unknown";
     const apiStatus = uptimes.status.status.toLowerCase();
     const latency = uptimes?.latency?.latency ?? 0;
-
     if (apiStatus === "down") return "error";
     if (latency > 500) return "warning";
     return "healthy";
@@ -211,74 +206,41 @@ export default function Dashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "healthy":
-        return "bg-emerald-500";
-      case "warning":
-        return "bg-yellow-500";
-      case "error":
-        return "bg-red-500";
-      default:
-        return "bg-gray-500";
+      case "healthy": return "bg-emerald-500";
+      case "warning": return "bg-yellow-500";
+      case "error": return "bg-red-500";
+      default: return "bg-gray-500";
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "healthy":
-        return (
-          <Badge className="bg-emerald-900/30 text-emerald-400 border-emerald-600">
-            Healthy
-          </Badge>
-        );
+        return <Badge className="bg-emerald-900/30 text-emerald-400 border-emerald-600">Healthy</Badge>;
       case "warning":
-        return (
-          <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-600">
-            High Latency
-          </Badge>
-        );
+        return <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-600">High Latency</Badge>;
       case "error":
-        return (
-          <Badge className="bg-red-900/30 text-red-400 border-red-600">
-            Down
-          </Badge>
-        );
+        return <Badge className="bg-red-900/30 text-red-400 border-red-600">Down</Badge>;
       default:
-        return (
-          <Badge className="bg-gray-900/30 text-gray-400 border-gray-600">
-            Unknown
-          </Badge>
-        );
+        return <Badge className="bg-gray-900/30 text-gray-400 border-gray-600">Unknown</Badge>;
     }
   };
 
-  // const deteleApi = (selectedAPIData: any) => {
-  //   let confirmDelete = confirm(
-  //     `Are you sure you want to delete "${selectedAPIData.name}"?`,
-  //   );
-  //   if (!confirmDelete) return;
-  //   if (!confirmDelete) return;
-  //   confirmDelete = confirm(
-  //     `You will loose all the monitering data are you sure?`,
-  //   );
-  //   if (!confirmDelete) return;
-  // };
   const deteleApi = async (selectedAPIData: any) => {
     let confirmDelete = confirm(
       `Are you sure you want to delete "${selectedAPIData.name}"?`
     );
     if (!confirmDelete) return;
 
-    confirmDelete = confirm(
-      `You will loose all the monitering data are you sure?`
-    );
+    confirmDelete = confirm(`You will loose all the monitering data are you sure?`);
     if (!confirmDelete) return;
 
     if (!BACKEND_URL) {
-      alert("Backend URL is not configured.");
+      toast.error("Backend URL is not configured.");
       return;
     }
     if (!session?.user?.email) {
-      alert("You must be logged in.");
+      toast.error("You must be logged in.");
       return;
     }
 
@@ -286,21 +248,15 @@ export default function Dashboard() {
       const userRes = await fetch(
         `${BACKEND_URL}/api/users?email=${session.user.email}`
       );
-      if (!userRes.ok) {
-        throw new Error("Failed to fetch user");
-      }
+      if (!userRes.ok) throw new Error("Failed to fetch user");
+
       const userData = await userRes.json();
       const userId = userData.id;
 
       const res = await fetch(`${BACKEND_URL}/api/apis`, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          api_id: selectedAPIData.id,
-          user_id: userId,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ api_id: selectedAPIData.id, user_id: userId }),
       });
 
       if (!res.ok) {
@@ -315,30 +271,26 @@ export default function Dashboard() {
         setSelectedAPI(newApis[0]?.id ?? null);
       }
 
-      alert("Service deleted successfully.");
+      toast.success("Service deleted successfully.");
     } catch (err) {
       console.error("Error deleting API:", err);
-      alert("Error deleting service. Check console for details.");
+      toast.error("Error deleting service. Check console for details.");
     }
   };
 
   if (loading) {
-    return (
-      <div>
-        <Loader />
-      </div>
-    );
+    return <div><Loader /></div>;
   }
 
   if (status === "loading") {
     return <Loader />;
   }
 
-  // console.log(uptimes)
   return (
     <div className="min-h-screen bg-black text-white px-4">
+      {/* ✅ ToastContainer added here as backup in case layout doesn't have it */}
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" pauseOnHover />
       <Navbar />
-      {/* Header */}
       <header className="border-b border-zinc-800 bg-black/95 backdrop-blur">
         <div className="mx-auto w-full max-w-screen-2xl px-6 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -355,20 +307,14 @@ export default function Dashboard() {
       </header>
 
       <div className="mx-auto w-full max-w-screen-2xl px-6 py-6 md:py-8">
-        {/* API Selection */}
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-            {/* Left: Title */}
             <div>
-              <h2 className="text-xl md:text-2xl font-bold mb-2">
-                API Monitoring
-              </h2>
+              <h2 className="text-xl md:text-2xl font-bold mb-2">API Monitoring</h2>
               <p className="text-zinc-400 text-sm md:text-base">
                 Select an API to view detailed monitoring data
               </p>
             </div>
-
-            {/* Right: Actions */}
             <div className="flex items-center gap-3">
               <Button
                 className="bg-emerald-600 hover:bg-emerald-700"
@@ -377,7 +323,6 @@ export default function Dashboard() {
                 <Server className="h-4 w-4 mr-2" />
                 Add New API
               </Button>
-
               <ExportButtons
                 data={exportData}
                 filename={`${selectedAPIData?.name || "api"}-analytics-report`}
@@ -394,9 +339,7 @@ export default function Dashboard() {
               <CardContent className="p-8 text-center">
                 <Server className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No APIs Found</h3>
-                <p className="text-zinc-400 mb-6">
-                  You haven't added any APIs to monitor yet.
-                </p>
+                <p className="text-zinc-400 mb-6">You haven't added any APIs to monitor yet.</p>
                 <Button
                   className="bg-emerald-600 hover:bg-emerald-700"
                   onClick={() => router.push("/add-api")}
@@ -408,41 +351,27 @@ export default function Dashboard() {
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {apis.map((api) => {
-                const cardStatus =
-                  selectedAPI === api.id ? getHealthStatus() : "unknown";
+                const cardStatus = selectedAPI === api.id ? getHealthStatus() : "unknown";
                 const selectedBorder =
-                  cardStatus === "healthy"
-                    ? "border-emerald-600 bg-emerald-900/10"
-                    : cardStatus === "warning"
-                    ? "border-yellow-600 bg-yellow-900/10"
-                    : cardStatus === "error"
-                    ? "border-red-600 bg-red-900/10"
-                    : "border-zinc-700 bg-zinc-900/10";
+                  cardStatus === "healthy" ? "border-emerald-600 bg-emerald-900/10" :
+                  cardStatus === "warning" ? "border-yellow-600 bg-yellow-900/10" :
+                  cardStatus === "error" ? "border-red-600 bg-red-900/10" :
+                  "border-zinc-700 bg-zinc-900/10";
                 return (
                   <Card
                     key={api.id}
                     className={`cursor-pointer transition-all border-2 ${
-                      selectedAPI === api.id
-                        ? selectedBorder
-                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                      selectedAPI === api.id ? selectedBorder : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
                     }`}
                     onClick={() => setSelectedAPI(api.id)}
                   >
                     <CardContent className="p-4 text-white">
                       <div className="flex items-start justify-between mb-2">
-                        <div
-                          className={`w-3 h-3 rounded-full ${getStatusColor(
-                            cardStatus
-                          )}`}
-                        />
+                        <div className={`w-3 h-3 rounded-full ${getStatusColor(cardStatus)}`} />
                         {getStatusBadge(cardStatus)}
                       </div>
-                      <h3 className="font-semibold mb-1 text-sm md:text-base">
-                        {api.name}
-                      </h3>
-                      <p className="text-zinc-400 text-xs md:text-sm">
-                        {api.url}
-                      </p>
+                      <h3 className="font-semibold mb-1 text-sm md:text-base">{api.name}</h3>
+                      <p className="text-zinc-400 text-xs md:text-sm">{api.url}</p>
                     </CardContent>
                   </Card>
                 );
@@ -451,19 +380,12 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Selected API Details */}
         {selectedAPIData && (
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div
-                  className={`w-4 h-4 rounded-full ${getStatusColor(
-                    getHealthStatus()
-                  )}`}
-                />
-                <h3 className="text-xl md:text-2xl font-bold">
-                  {selectedAPIData.name}
-                </h3>
+                <div className={`w-4 h-4 rounded-full ${getStatusColor(getHealthStatus())}`} />
+                <h3 className="text-xl md:text-2xl font-bold">{selectedAPIData.name}</h3>
                 {getStatusBadge(getHealthStatus())}
               </div>
               <div className="flex gap-2">
@@ -474,9 +396,9 @@ export default function Dashboard() {
                   onClick={() => {
                     if (selectedAPIData?.api_key) {
                       navigator.clipboard.writeText(selectedAPIData.api_key);
-                      alert("API key copied to clipboard!"); // or use a toast instead of alert
+                      toast.success("API key copied to clipboard! ✅");
                     } else {
-                      alert("No API key found!");
+                      toast.error("No API key found!");
                     }
                   }}
                 >
@@ -497,23 +419,15 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Monitoring Dashboard - Only show if an API is selected */}
         {selectedAPIData && (
           <div className="grid gap-6">
-            {/* Key Infos Row */}
-
             {uptimes && <InfoChart selectedAPI={selectedAPI || ""} />}
-
-            {/* Charts Row */}
-
-            {/* // EndpointChart & Traffic value chart */}
 
             <div className="grid gap-6 lg:grid-cols-2">
               <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-                    <LineChart className="h-5 w-5 text-emerald-500" />
-                    Traffic
+                    <LineChart className="h-5 w-5 text-emerald-500" />Traffic
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[350px] p-4 pt-0">
@@ -524,8 +438,7 @@ export default function Dashboard() {
               <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-                    <LineChart className="h-5 w-5 text-emerald-500" />
-                    Endpoints Usage Pie Chart
+                    <LineChart className="h-5 w-5 text-emerald-500" />Endpoints Usage Pie Chart
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[350px] pt-0 m-auto">
@@ -536,8 +449,7 @@ export default function Dashboard() {
               <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-                    <LineChart className="h-5 w-5 text-emerald-500" />
-                    Country Distribution
+                    <LineChart className="h-5 w-5 text-emerald-500" />Country Distribution
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[350px] p-4 pt-0">
@@ -548,8 +460,7 @@ export default function Dashboard() {
               <Card className="bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-                    <LineChart className="h-5 w-5 text-emerald-500" />
-                    City Distribution
+                    <LineChart className="h-5 w-5 text-emerald-500" />City Distribution
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[350px] p-4 pt-0">
@@ -557,22 +468,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
-            <div className="w-full ml-4">
-              {/* uptimes wala graph */}
-              {/* <Card className="w-full bg-zinc-900 border border-zinc-800 shadow-md rounded-2xl">
-  <CardHeader className="pb-2">
-    <CardTitle className="flex items-center gap-2 text-white text-lg font-semibold">
-      <LineChart className="h-5 w-5 text-emerald-500" />
-      Traffic
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="h-[350px] p-4 pt-0 w-full">
-    <UptimeChart timestamps={uptimes[0]?.timestamps || []} />
-  </CardContent>
-</Card> */}
-            </div>
 
-            {/* Recent Activity */}
             <Card className="bg-zinc-900 border-zinc-800">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -585,34 +481,22 @@ export default function Dashboard() {
                   <div className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/50">
                     <div className="w-2 h-2 rounded-full bg-emerald-500" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        API Response time improved
-                      </p>
-                      <p className="text-xs text-zinc-400">
-                        Average response time decreased by 15ms - 2 minutes ago
-                      </p>
+                      <p className="text-sm font-medium">API Response time improved</p>
+                      <p className="text-xs text-zinc-400">Average response time decreased by 15ms - 2 minutes ago</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/50">
                     <div className="w-2 h-2 rounded-full bg-yellow-500" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        High traffic detected
-                      </p>
-                      <p className="text-xs text-zinc-400">
-                        Request volume 25% above normal - 15 minutes ago
-                      </p>
+                      <p className="text-sm font-medium">High traffic detected</p>
+                      <p className="text-xs text-zinc-400">Request volume 25% above normal - 15 minutes ago</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/50">
                     <div className="w-2 h-2 rounded-full bg-blue-500" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium">
-                        New monitoring location added
-                      </p>
-                      <p className="text-xs text-zinc-400">
-                        Tokyo monitoring node is now active - 1 hour ago
-                      </p>
+                      <p className="text-sm font-medium">New monitoring location added</p>
+                      <p className="text-xs text-zinc-400">Tokyo monitoring node is now active - 1 hour ago</p>
                     </div>
                   </div>
                 </div>
