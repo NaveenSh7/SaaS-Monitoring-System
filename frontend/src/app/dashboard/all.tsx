@@ -110,7 +110,7 @@ const { data: session } = useSession();
                     {getStatusBadge(api.status)}
                   </div>
                   <h3 className="font-semibold mb-1 text-sm md:text-base">{api.name}</h3>
-                  <p className="text-zinc-400 text-xs md:text-sm">{api.url}</p>
+                  <p className="text-zinc-400 text-xs md:text-sm break-words">{api.url}</p>
                 </CardContent>
               </Card>
             ))}
@@ -298,7 +298,7 @@ const { data: session } = useSession();
           {/* Recent Activity */}
           <Card className="bg-zinc-900 border-zinc-800">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <Activity className="h-5 w-5 text-emerald-500" />
                 Recent Activity & Alerts
               </CardTitle>
@@ -308,22 +308,22 @@ const { data: session } = useSession();
                 <div className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/50">
                   <div className="w-2 h-2 rounded-full bg-emerald-500" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium">API Response time improved</p>
-                    <p className="text-xs text-zinc-400">Average response time decreased by 15ms - 2 minutes ago</p>
+                    <p className="text-sm font-medium text-white">API Response time improved</p>
+                    <p className="text-xs text-zinc-300">Average response time decreased by 15ms - 2 minutes ago</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/50">
                   <div className="w-2 h-2 rounded-full bg-yellow-500" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium">High traffic detected</p>
-                    <p className="text-xs text-zinc-400">Request volume 25% above normal - 15 minutes ago</p>
+                    <p className="text-sm font-medium text-white">High traffic detected</p>
+                    <p className="text-xs text-zinc-300">Request volume 25% above normal - 15 minutes ago</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/50">
                   <div className="w-2 h-2 rounded-full bg-blue-500" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium">New monitoring location added</p>
-                    <p className="text-xs text-zinc-400">Tokyo monitoring node is now active - 1 hour ago</p>
+                    <p className="text-sm font-medium text-white">New monitoring location added</p>
+                    <p className="text-xs text-zinc-300">Tokyo monitoring node is now active - 1 hour ago</p>
                   </div>
                 </div>
               </div>
