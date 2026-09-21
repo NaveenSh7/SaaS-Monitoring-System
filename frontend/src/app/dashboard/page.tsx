@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import ExportButtons from "@/components/ExportButtons";
+import DeleteConfirmationModal from "@/components/DeleteConfirmationModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,6 +94,7 @@ export default function Dashboard() {
   const [selectedAPI, setSelectedAPI] = useState<string | null>(null);
   const [uptimes, setUptimes] = useState<UptimeData | null>(null);
   const [dashboardData, setdashboardData] = useState<DashData | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -227,14 +229,6 @@ export default function Dashboard() {
   };
 
   const deteleApi = async (selectedAPIData: any) => {
-    let confirmDelete = confirm(
-      `Are you sure you want to delete "${selectedAPIData.name}"?`
-    );
-    if (!confirmDelete) return;
-
-    confirmDelete = confirm(`You will loose all the monitering data are you sure?`);
-    if (!confirmDelete) return;
-
     if (!BACKEND_URL) {
       toast.error("Backend URL is not configured.");
       return;
@@ -409,7 +403,7 @@ export default function Dashboard() {
                   size="sm"
                   variant="outline"
                   className="border-zinc-700 text-zinc-800 cursor-pointer hover:bg-red-400"
-                  onClick={() => deteleApi(selectedAPIData)}
+                  onClick={() => setShowDeleteConfirm(true)}
                 >
                   <AlertCircle className="h-4 w-4 mr-2" />
                   Delete Service
@@ -417,6 +411,18 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+        )}
+
+        {selectedAPIData && (
+          <DeleteConfirmationModal
+            open={showDeleteConfirm}
+            serviceName={selectedAPIData.name}
+            onCancel={() => setShowDeleteConfirm(false)}
+            onConfirm={() => {
+              setShowDeleteConfirm(false);
+              deteleApi(selectedAPIData);
+            }}
+          />
         )}
 
         {selectedAPIData && (
