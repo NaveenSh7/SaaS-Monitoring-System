@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Loader from "@/components/Loader";
 
-import { Activity } from "lucide-react";
+import { Activity, User as UserIcon } from "lucide-react";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -53,6 +53,24 @@ export default function Navbar() {
           {session ? (
             <>
               <div className="flex items-center gap-x-4">
+                <Link
+                  href="/profile"
+                  className="rounded-full border border-transparent hover:border-emerald-600"
+                  aria-label="Profile"
+                >
+                  {session.user?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={session.user.image}
+                      alt={session.user.name || "Profile"}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-zinc-800 flex items-center justify-center">
+                      <UserIcon className="h-4 w-4 text-emerald-500" />
+                    </div>
+                  )}
+                </Link>
                 <Link
                   href="/dashboard"
                   className="text-sm font-medium px-2 py-1 hover:text-white cursor bg-emerald-600 hover:bg-emerald-700 border-0 rounded-sm"
